@@ -1,0 +1,12 @@
+{
+	"name": "server",
+	"version": "0.0.1",
+	"private": "true",
+	"dependencies": {
+		"socket.io": "0.9.16",
+		"express": "3.4.8",
+		"nodemailer": "0.6.0",
+		"mongoose": "3.8.4"
+	}
+
+}
