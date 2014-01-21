@@ -3,9 +3,10 @@ var express = require('express'),
 	server = require('http').createServer(app),
 	io = require('socket.io').listen(server),
 	mongoose = require('mongoose'),
-	nodemailer = require('nodemailer');
+	nodemailer = require('nodemailer'),
+    clients = {};
 
-server.listen(3000, "192.168.1.35");
+server.listen(3000, "192.168.10.145");
 mongoose.connect('mongodb://localhost/v2b');
 
 app.get('/', rootGetRequest);
@@ -13,25 +14,42 @@ app.get('/', rootGetRequest);
 function rootGetRequest(req, res){
 	res.sendfile(__dirname + '/index.html');
 }
+io.set('log level', 1); // reduce logging
 
 io.sockets.on('connection', function(socket){
+
 	socket.emit("hello", "new msg!");
 
+    socket.on('user:login', function(user, callback){
+        console.log("entra al login");
+        console.log(user);
+        if (user.username){
+            console.log("entra al user.username");
+            User.findOne({"username": user.username}, function(err, object){
+                console.log(object);
+                callback(object);
+            });
+        }
+        else{
+            console.log("User attempt to login but failed");
+        }
+    });
     socket.on('user:add', function(user, callback){
+        console.log("entra al add");
         if (user.username){
             var addedUser = new User(user);
             console.log(addedUser);
             addedUser.save(saveStatus);
             console.log(User.find({}, function(error, users){
                 console.log(users);
-                callback(users);
+                if(callback) callback(users);
             }));
         }
         else
-            callback(false);
+            if (callback) callback(false);
     });
     socket.on('user:list', function(){
-       return
+        console.log("entra al list");
     });
 });
 
