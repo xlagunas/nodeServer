@@ -35,7 +35,7 @@ userSchema.statics.addRelationship = function(proposer, proposed, cb){
             result.data = "User not found";
         }
         else{
-            user.contacts.push({'username': proposed});
+            user.contacts.create({'username': proposed});
             result.status = 'success';
             user.update();
             if (cb) cb(result);
