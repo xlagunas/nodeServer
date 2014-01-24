@@ -1,5 +1,6 @@
 var mongoose = require('mongoose'),
-    user = require('./persistence')
+    user = require('./persistence'),
+    _ = require('underscore');
 
 mongoose.connect('mongodb://localhost/v2b');
 
@@ -13,6 +14,16 @@ var josep = new user.userModel(
         password: '123456'
     }
 );
+var xavi = new user.userModel(
+    {
+        username: 'xlagunas',
+        name: 'Xavier',
+        firstSurname: 'Lagunas',
+        lastSurname: 'Calpe',
+        email: 'xlagunas@gmail.com',
+        password: '123456'
+    }
+);
 var carles = new user.userModel(
     {
         username: 'clagunas',
@@ -20,6 +31,17 @@ var carles = new user.userModel(
         firstSurname: 'Lagunas',
         lastSurname: 'Calpe',
         email: 'hewson90@gmail.com',
+        password: '123456'
+    }
+);
+
+var raquel = new user.userModel(
+    {
+        username: 'rlopez',
+        name: 'Raquel',
+        firstSurname: 'Lopez',
+        lastSurname: 'Mallebrera',
+        email: 'raquel.lopez.mallebrera@gmail.com',
         password: '123456'
     }
 );
@@ -44,7 +66,7 @@ function saveCallback(error){
     if (error)
         console.log(error);
     else
-        console.log("successfully saved");
+        console.log("save successful");
 }
 
 
@@ -69,24 +91,54 @@ function saveCallback(error){
 //user.userModel.addRelationship('jlagunas','clagunas', function(data){
 //    console.log(data);
 //})
+function createUsers(){
+    josep.save(saveCallback);
+    carles.save(saveCallback);
+    xavi.save(saveCallback);
+    raquel.save(saveCallback);
+}
 
-user.userModel.findByUsername('jlagunas', function(error, josep){
-   user.userModel.findByUsername('clagunas', function(error, carles){
-       josep.contacts.push(carles);
-       josep.save(function(error, retVal){
-           if (retVal === 'error')
-                console.log("Hi ha hagut un error!");
-           else{
-               console.log(retVal);
-           }
-       })
-   });
-});
+function login(){
+    console.log("trying to log with xlagunas 123456");
+    user.userModel.login('xlagunas', '123456', function(login){
+        if (login.status === 'error'){
+            console.log("there is an error");
+        }
+        else{
+            console.log("sucessful login: ");
+            var u = login.data;
+            u.updateRelationship('clagunas', 'ACCEPTED');
 
-user.userModel.findOne({username: 'jlagunas'}).populate('contacts').exec(function(error, data){
-//user.userModel.findOne({username: 'jlagunas'}).exec(function(error, data){
-    if (error) console.log(error);
-    else{
-        console.log(data);
-    }
-});
+        }
+    })
+}
+function addContact(){
+    user.userModel.addRelationship('xlagunas','clagunas' , true, function(result){
+        console.log(result);
+    });
+}
+
+function getContact(){
+    user.userModel.findOne({'username': 'jlagunas'})
+        .exec(function(err, obj){
+        if (err)
+            console.log(err);
+        else{
+            console.log("vull mirar aqui");
+            for(var i=0;i<obj.contacts.length;i++){
+                console.log(obj.contacts[i]);
+            }
+//            console.log(obj);
+        }
+
+    });
+}
+
+//createUsers();
+login();
+//addContact();
+//getContact();
+//user.userModel.find({'contacts.username': 'xlagunas'}, function(err, obj){
+//    if (err) throw err;
+//    console.log(obj);
+//})
