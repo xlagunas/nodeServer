@@ -18,15 +18,27 @@ var userSchema = new mongoose.Schema(
         email: {type: String, required: true},
         status: {type: String, default: 'OFFLINE'},
         password: {type: String, select: false, required: true},
-        contacts: {type: [{username: {type: 'String'}, relStatus: {type:'String', default: 'PENDING'}}], select: false},
-        joinDate: {type: Date, default: Date.now(), select:false},
-        thumbnail: {type: String, default: 'profile.png'},
-        calls: {type: [callSchema], select: false}
+        contacts: [
+            {
+                contact: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'Usuari',
+                    unique: true
+                },
+                relStatus: {
+                    type:'String',
+                    default: 'PENDING'
+                }
+            }],
+                joinDate: {type: Date, default: Date.now(), select:false},
+                thumbnail: {type: String, default: 'profile.png'},
+                calls: {type: [callSchema], select: false}
     }
 );
 userSchema.statics.findByUsername = function(username, cb){
     this.findOne({username: username}, cb);
 };
+
 userSchema.statics.addRelationship = function(proposer, proposed, cb){
     this.findOne({username: proposer}).select('+contacts').exec(function(error, user){
         var result = {};
@@ -35,9 +47,9 @@ userSchema.statics.addRelationship = function(proposer, proposed, cb){
             result.data = "User not found";
         }
         else{
-            user.contacts.create({'username': proposed});
+            user.contacts.push({'contact': proposed});
             result.status = 'success';
-            user.update();
+            user.update()
             if (cb) cb(result);
         }
     })
