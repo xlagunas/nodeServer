@@ -107,8 +107,11 @@ function login(){
         else{
             console.log("sucessful login: ");
             var u = login.data;
-            u.updateRelationship('clagunas', 'ACCEPTED');
+//            u.updateRelationship('clagunas', 'ACCEPTED');
+            u.createRelationship('clagunas', false, function(data){
+                console.log(data);
 
+            })
         }
     })
 }

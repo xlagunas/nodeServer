@@ -1,7 +1,6 @@
 var mongoose = require('mongoose'),
     _ = require('underscore');
 
-//mongoose.connect('mongodb://localhost/v2b');
 var callSchema = new mongoose.Schema(
     {
         caller: String,
@@ -21,7 +20,6 @@ var userSchema = new mongoose.Schema(
         password: {type: String, select: false, required: true},
         contacts: [
             {
-//                _id: {type: String, unique: true},
                 username: String,
                 relStatus: {type:'String', default: 'PENDING'},
                 displayable: Boolean
@@ -46,7 +44,6 @@ userSchema.statics.addRelationship = function(proposer, proposed, displayable, c
                 return cb(result);
         }
         else{
-//            var ids = _.pluck(user.contacts, '_id');
             var ids = _.pluck(user.contacts, 'username');
             console.log(ids);
             console.log(_.contains(ids, proposed));
@@ -59,7 +56,6 @@ userSchema.statics.addRelationship = function(proposer, proposed, displayable, c
             }
             else{
                 user.contacts.push({username: proposed, displayable: displayable});
-//                user.contacts.push({_id: proposed, displayable: displayable});
                 user.save(function(error, data){
                     if (error){
                         result.status = 'error';
@@ -76,7 +72,7 @@ userSchema.statics.addRelationship = function(proposer, proposed, displayable, c
             }
         }
     })
-}
+};
 
 userSchema.statics.login = function(username, password, cb){
     this.findOne({username: username}).select('+password').exec(function(err, user){
@@ -99,14 +95,44 @@ userSchema.statics.login = function(username, password, cb){
             cb(result);
     });
 };
+userSchema.methods.createRelationship = function(contact, displayable, cb){
+    var result = {};
+    var ids = _.pluck(this.contacts, 'username');
+    console.log(ids);
+    console.log(_.contains(ids, contact));
 
+    if (_.contains(ids, contact)){
+        result.status = 'error'
+        result.data = "relationship already exists";
+
+        if (cb)
+            return cb(result);
+    }
+    else{
+        this.contacts.push({username: contact, displayable: displayable});
+        this.save(function(error, data){
+            if (error){
+                result.status = 'error';
+                result.data = 'Error updating model';
+            }
+            else{
+                result.status = 'success';
+                result.data = data;
+            }
+            if (cb)
+                return cb(result);
+
+        });
+    }
+};
 userSchema.methods.updateRelationship = function(contact, status, cb){
     var contact = _.where(this.contacts,{username: contact});
     var result = {};
     if (contact.length == 0){
         result.error = 'error';
         result.data = 'No relationship found';
-        return cb(result);
+        if(cb)
+            return cb(result);
     }
     else{
         contact[0].relStatus = status;
@@ -136,8 +162,6 @@ userSchema.methods.getContacts = function(relStatus, cb){
     console.log("queryObject"+ JSON.stringify(queryObject));
 
     this.model('Usuari').findOne(queryObject).select('+contacts').exec(function(err, data){
-//    this.model('Usuari').findOne(queryObject,['contacts'],function(err, data){
-        console.log(data);
         if (err){
             result.status = 'error'
             result.data = "Error executing query";
@@ -151,17 +175,15 @@ userSchema.methods.getContacts = function(relStatus, cb){
     });
 }
 
-var User = mongoose.model('Usuari', userSchema);
-    User.on('error', function(error){
-        console.log("hi ha un error");
-        console.log(error);
-    });
+//var User = mongoose.model('Usuari', userSchema);
+//    User.on('error', function(error){
+//        console.log("hi ha un error");
+//        console.log(error);
+//    });
 
 
-var Call = mongoose.model('Trucada', callSchema);
+var Call = mongoose.model('Call', callSchema);
+var User = mongoose.model('User', callSchema);
 
-
-//var relSchema = new mongoose.Schema({contact: mongoose.Schema.ObjectId, proposer: mongoose.Schema.ObjectId, date: Date, status: String});
-exports.userModel = User;
-exports.callModel = Call;
-exports.UserSchema = userSchema;
+exports.User = User;
+exports.Call = Call;
