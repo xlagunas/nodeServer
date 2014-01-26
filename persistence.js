@@ -151,27 +151,11 @@ userSchema.methods.updateRelationship = function(contact, status, cb){
     }
 };
 
-userSchema.methods.getContacts = function(relStatus, cb){
-    var queryObject = {'username': this.username},
-        result = {};
-
-    if (relStatus != 'ALL' || relStatus ==null){
-        queryObject.contacts = {'relStatus':  relStatus};
-    }
-
-    console.log("queryObject"+ JSON.stringify(queryObject));
-
-    this.model('Usuari').findOne(queryObject).select('+contacts').exec(function(err, data){
-        if (err){
-            result.status = 'error'
-            result.data = "Error executing query";
-        }
-        else{
-            result.status = 'success'
-            result.data = data.contacts;
-        }
+userSchema.methods.getAllContacts = function(cb){
+    User.find({"username": {$in: _.pluck(this.contacts, 'username')}}, function(err, elements){
+        if (err) throw err;
         if (cb)
-            cb(result);
+            cb(elements);
     });
 }
 
@@ -183,7 +167,7 @@ userSchema.methods.getContacts = function(relStatus, cb){
 
 
 var Call = mongoose.model('Call', callSchema);
-var User = mongoose.model('User', callSchema);
+var User = mongoose.model('User', userSchema);
 
 exports.User = User;
 exports.Call = Call;

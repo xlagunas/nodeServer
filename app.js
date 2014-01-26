@@ -6,7 +6,7 @@ var express = require('express'),
 	nodemailer = require('nodemailer'),
     clients = {};
 
-server.listen(3000, "192.168.10.145");
+server.listen(3000, "192.168.1.34");
 mongoose.connect('mongodb://localhost/v2b');
 
 app.get('/', rootGetRequest);
