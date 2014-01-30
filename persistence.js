@@ -1,12 +1,20 @@
 var mongoose = require('mongoose'),
     _ = require('underscore');
 
-//mongoose.connect('mongodb://localhost/v2b');
+mongoose.connect('mongodb://localhost/v2b_alt');
 var callSchema = new mongoose.Schema(
     {
         caller: String,
-        callees: [{username: String}],
+        callees: [userSchema],
         type: String
+    }
+);
+
+var testSchema = new mongoose.Schema(
+    {
+        user: {type: mongoose.Schema.ObjectId, ref: 'USER'},
+        status: String,
+        date: {type: Date, default: Date.now()}
     }
 );
 
@@ -19,19 +27,33 @@ var userSchema = new mongoose.Schema(
         email: {type: String, required: true},
         status: {type: String, default: 'OFFLINE'},
         password: {type: String, select: false, required: true},
-        contacts: [
-            {
-//                _id: {type: String, unique: true},
-                username: String,
-                relStatus: {type:'String', default: 'PENDING'},
-                displayable: Boolean
-            }
-        ],
+        contacts: [{type: mongoose.Schema.ObjectId, ref: 'test'}],
         joinDate: {type: Date, default: Date.now(), select:false},
-        thumbnail: {type: String, default: 'profile.png'},
-        calls: {type: [callSchema], select: false}
+        thumbnail: {type: String, default: 'profile.png'}
     }
 );
+//var userSchema = new mongoose.Schema(
+//    {
+//        username: {type: String, index: true, unique: true, required: true},
+//        name: String,
+//        firstSurname: String,
+//        lastSurname: String,
+//        email: {type: String, required: true},
+//        status: {type: String, default: 'OFFLINE'},
+//        password: {type: String, select: false, required: true},
+//        contacts: [
+//            {
+////                _id: {type: String, unique: true},
+//                username: String,
+//                relStatus: {type:'String', default: 'PENDING'},
+//                displayable: Boolean
+//            }
+//        ],
+//        joinDate: {type: Date, default: Date.now(), select:false},
+//        thumbnail: {type: String, default: 'profile.png'},
+//        calls: {type: [callSchema], select: false}
+//    }
+//);
 userSchema.statics.findByUsername = function(username, cb){
     this.findOne({username: username}, cb);
 };
@@ -165,3 +187,33 @@ var Call = mongoose.model('Trucada', callSchema);
 exports.userModel = User;
 exports.callModel = Call;
 exports.UserSchema = userSchema;
+
+var User2 = mongoose.model('USER', userSchema);
+var testSchema = mongoose.model('test', testSchema);
+
+//var x = User2.create({username: 'x2',
+//    name: 'x',
+//    firstSurname: 'x',
+//    lastSurname: 'x',
+//    email: 'x@123.com',
+//    password: '123456'
+//}, function(error, user){
+//    if (error)
+//        throw error;
+//    console.log('x creat correctament');
+//    var y = testSchema.create({user: user, status: 'DISCONNECTED'}, function(error, relation){
+//        user.contacts.addToSet(relation);
+//        user.save(function(error){
+//            if (error) throw error;
+//            else console.log("updated");
+//        })
+//    });
+//    }
+//);
+
+User2.find({username: 'x2'}).populate("contacts").exec(function (error, user){
+    if (error) throw error;
+//    console.log(object);
+    console.log(user)
+    console.log(user.contacts);
+});
