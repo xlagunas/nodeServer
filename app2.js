@@ -1,10 +1,10 @@
 var mongoose = require('mongoose'),
-    user = require('./persistence'),
+    persistence = require('./persistence'),
     _ = require('underscore');
 
 mongoose.connect('mongodb://localhost/v2b');
 
-var josep = new user.userModel(
+var josep = new persistence.User(
     {
         username: 'jlagunas',
         name: 'Josep',
@@ -14,7 +14,7 @@ var josep = new user.userModel(
         password: '123456'
     }
 );
-var xavi = new user.userModel(
+var xavi = new persistence.User(
     {
         username: 'xlagunas',
         name: 'Xavier',
@@ -24,7 +24,7 @@ var xavi = new user.userModel(
         password: '123456'
     }
 );
-var carles = new user.userModel(
+var carles = new persistence.User(
     {
         username: 'clagunas',
         name: 'Carles',
@@ -35,7 +35,7 @@ var carles = new user.userModel(
     }
 );
 
-var raquel = new user.userModel(
+var raquel = new persistence.User(
     {
         username: 'rlopez',
         name: 'Raquel',
@@ -100,26 +100,32 @@ function createUsers(){
 
 function login(){
     console.log("trying to log with xlagunas 123456");
-    user.userModel.login('xlagunas', '123456', function(login){
+    persistence.User.login('jlagunas', '123456', function(login){
         if (login.status === 'error'){
             console.log("there is an error");
         }
         else{
             console.log("sucessful login: ");
             var u = login.data;
-            u.updateRelationship('clagunas', 'ACCEPTED');
+//            u.updateRelationship('clagunas', 'ACCEPTED');
+//            u.createRelationship('clagunas', false, function(data){
+//                console.log(data);
+            u.getAllContacts(function(data){
+                console.log(data);
+            });
 
+//            })
         }
     })
 }
 function addContact(){
-    user.userModel.addRelationship('xlagunas','clagunas' , true, function(result){
+    persistence.User.addRelationship('clagunas','xlagunas' , true, function(result){
         console.log(result);
     });
 }
 
 function getContact(){
-    user.userModel.findOne({'username': 'jlagunas'})
+    persistence.User.findOne({'username': 'jlagunas'})
         .exec(function(err, obj){
         if (err)
             console.log(err);
@@ -135,9 +141,9 @@ function getContact(){
 }
 
 //createUsers();
-login();
-//addContact();
-//getContact();
+//login();
+addContact();
+//getContacts();
 //user.userModel.find({'contacts.username': 'xlagunas'}, function(err, obj){
 //    if (err) throw err;
 //    console.log(obj);
