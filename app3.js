@@ -30,6 +30,43 @@ io.sockets.on('connection', function (socket) {
             cb(retVal);
         });
     });
+    socket.on('find candidates', function(msg, cb){
+        console.log(msg);
+       persistence.User.find({username:  new RegExp(msg.username, "i")}).select("name firstName lastName thumbnail")
+           .exec(function(error, users){
+               if (error) throw error;
+
+               console.log(users);
+               if (cb) cb(users);
+           });
+    });
+    socket.on('create request', function(msg, cb){
+       console.log("entro");
+       console.log(msg);
+
+       var rel = new persistence.Relationship({relStatus: 'PENDING', user: msg.requested._id, notify: false});
+       rel.save(function(error){
+           if (error) throw error;
+           persistence.User.findByIdAndUpdate(msg.requester._id,{$addToSet: {contacts: rel}},{upsert: true},function(error, user){
+               if (error) throw error;
+               console.log(user);
+
+
+               var rel2 = new persistence.Relationship({relStatus: 'PENDING', user: msg.requester._id, notify: true});
+               rel2.save(function(error){
+                   if (error) throw error;
+                   persistence.User.findByIdAndUpdate(msg.requested._id,{$addToSet: {contacts: rel2}},{upsert: true},function(error, user2){
+                       if (error) throw error;
+                       console.log(user2);
+                       if(cb)
+                        cb([rel,rel2]);
+                   });
+               });
+           });
+       });
+
+
+    });
 
     socket.on('pending requests', function(msg, cb){
 //        console.log(msg);
@@ -111,7 +148,7 @@ function notifyContacts(user){
  * */
 function sendOwnContacts(user, callback){
         user.getAllContacts(function(data){
-//        console.log(data);
+        console.log(data);
         var parsedContacts = [];
         for(var i=0;i<data.length;i++){
           var user;

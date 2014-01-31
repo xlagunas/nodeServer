@@ -140,9 +140,9 @@ function getContact(){
     });
 }
 
-//createUsers();
+createUsers();
 //login();
-addContact();
+//addContact();
 //getContacts();
 //user.userModel.find({'contacts.username': 'xlagunas'}, function(err, obj){
 //    if (err) throw err;

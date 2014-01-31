@@ -8,6 +8,11 @@ var callSchema = new mongoose.Schema(
         type: String
     }
 );
+var relationSchema = new mongoose.Schema({
+    user: {type: mongoose.Schema.ObjectId, ref: 'User'},
+    relStatus: {type: String, enum: ['ACCEPTED', 'REJECTED', 'PENDING', 'BLOCKED'],
+    notify: Boolean}
+});
 
 var userSchema = new mongoose.Schema(
     {
@@ -18,18 +23,33 @@ var userSchema = new mongoose.Schema(
         email: {type: String, required: true},
         status: {type: String, default: 'OFFLINE'},
         password: {type: String, select: false, required: true},
-        contacts: [
-            {
-                username: String,
-                relStatus: {type:'String', default: 'PENDING'},
-                displayable: Boolean
-            }
-        ],
+        contacts: [relationSchema],
         joinDate: {type: Date, default: Date.now(), select:false},
-        thumbnail: {type: String, default: 'profile.png'},
-        calls: {type: [callSchema], select: false}
+        thumbnail: {type: String, default: 'profile.png'}
     }
 );
+
+//var userSchema = new mongoose.Schema(
+//    {
+//        username: {type: String, index: true, unique: true, required: true},
+//        name: String,
+//        firstSurname: String,
+//        lastSurname: String,
+//        email: {type: String, required: true},
+//        status: {type: String, default: 'OFFLINE'},
+//        password: {type: String, select: false, required: true},
+//        contacts: [
+//            {
+//                username: String,
+//                relStatus: {type:'String', default: 'PENDING'},
+//                displayable: Boolean
+//            }
+//        ],
+//        joinDate: {type: Date, default: Date.now(), select:false},
+//        thumbnail: {type: String, default: 'profile.png'},
+//        calls: {type: [callSchema], select: false}
+//    }
+//);
 userSchema.statics.findByUsername = function(username, cb){
     this.findOne({username: username}, cb);
 };
@@ -76,6 +96,7 @@ userSchema.statics.addRelationship = function(proposer, proposed, displayable, c
 
 userSchema.statics.login = function(username, password, cb){
     this.findOne({username: username}).select('+password').exec(function(err, user){
+        console.log(user);
         var result = {};
         if (err){
             result.status = 'error'
@@ -152,7 +173,7 @@ userSchema.methods.updateRelationship = function(contact, status, cb){
 };
 
 userSchema.methods.getAllContacts = function(cb){
-    User.find({"username": {$in: _.pluck(this.contacts, 'username')}}, function(err, elements){
+    User.findById({$in: _.pluck(this.contacts, 'user')}, function(err, elements){
         if (err) throw err;
         if (cb)
             cb(elements);
@@ -168,6 +189,8 @@ userSchema.methods.getAllContacts = function(cb){
 
 var Call = mongoose.model('Call', callSchema);
 var User = mongoose.model('User', userSchema);
+var Relationship = mongoose.model('Relationship', relationSchema);
 
 exports.User = User;
 exports.Call = Call;
+exports.Relationship = Relationship;

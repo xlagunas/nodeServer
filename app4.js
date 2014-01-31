@@ -4,7 +4,6 @@ var Mongoose = require('mongoose'),
 Mongoose.connect('mongodb://localhost/v2b_debug');
 
 var relationSchema = new Mongoose.Schema({
-//    user: [userSchema],
     user: {type: Mongoose.Schema.ObjectId, ref: 'User'},
     relStatus: {type: String, enum: ['ACCEPTED', 'REJECTED', 'PENDING', 'BLOCKED']}
 });
@@ -18,7 +17,6 @@ var userSchema = new Mongoose.Schema(
         email: {type: String, required: true},
         status: {type: String, default: 'OFFLINE'},
         password: {type: String, select: false, required: true},
-//        contacts: {type: Mongoose.Schema.ObjectId, ref: 'Relation'},
         contacts: [relationSchema],
         joinDate: {type: Date, default: Date.now(), select:false},
         thumbnail: {type: String, default: 'profile.png'}
