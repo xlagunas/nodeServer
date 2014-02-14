@@ -8,11 +8,13 @@ var callSchema = new mongoose.Schema(
         type: String
     }
 );
-var relationSchema = new mongoose.Schema({
-    user: {type: mongoose.Schema.ObjectId, ref: 'User'},
-    relStatus: {type: String, enum: ['ACCEPTED', 'REJECTED', 'PENDING', 'BLOCKED'],
-    notify: Boolean}
-});
+var relationSchema = new mongoose.Schema(
+    {
+        user: {type: mongoose.Schema.ObjectId, ref: 'User'},
+        relStatus: {type: String, enum: ['ACCEPTED', 'REJECTED', 'PENDING', 'BLOCKED']},
+        notify: {type: Boolean, default: false}
+    }
+);
 
 var userSchema = new mongoose.Schema(
     {
@@ -96,7 +98,6 @@ userSchema.statics.addRelationship = function(proposer, proposed, displayable, c
 
 userSchema.statics.login = function(username, password, cb){
     this.findOne({username: username}).select('+password').exec(function(err, user){
-        console.log(user);
         var result = {};
         if (err){
             result.status = 'error'
@@ -173,19 +174,40 @@ userSchema.methods.updateRelationship = function(contact, status, cb){
 };
 
 userSchema.methods.getAllContacts = function(cb){
-    User.findById({$in: _.pluck(this.contacts, 'user')}, function(err, elements){
-        if (err) throw err;
-        if (cb)
-            cb(elements);
+    var selectedIds =_.pluck(this.contacts, '_id');
+    console.log(selectedIds);
+    Relationship.find(
+        {
+            $and:[
+                {
+                    _id: {
+                        $in: selectedIds
+                        }
+                },
+                {
+                    $or: [
+                        {relStatus:'ACCEPTED'},
+                        {relStatus: 'PENDING', notify: true}
+                    ]
+                }
+            ]
+        })
+//        Relationship.find(
+//        {
+//            $or: [{_id: {$in: selectedIds},relStatus:'ACCEPTED'},{_id: {$in: selectedIds},relStatus: 'PENDING', notify: true} ]
+//        })
+        .populate("user").exec(function(err, elements){
+            if (err)
+                throw err;
+            if (cb)
+                cb(_.pluck(elements, 'user'));
     });
-}
-
-//var User = mongoose.model('Usuari', userSchema);
-//    User.on('error', function(error){
-//        console.log("hi ha un error");
-//        console.log(error);
+//    User.find({_id: {$in: _.pluck(this.contacts, 'user')}}, function(err, elements){
+//        if (err) throw err;
+//        if (cb)
+//            cb(elements);
 //    });
-
+}
 
 var Call = mongoose.model('Call', callSchema);
 var User = mongoose.model('User', userSchema);

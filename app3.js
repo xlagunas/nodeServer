@@ -25,19 +25,18 @@ io.sockets.on('connection', function (socket) {
                        }
                    }
                }(socket));
+               if (cb)
+                   cb(retVal);
            }
-           if (cb)
-            cb(retVal);
+
         });
     });
     socket.on('find candidates', function(msg, cb){
-        console.log(msg);
        persistence.User.find({username:  new RegExp(msg.username, "i")}).select("name firstName lastName thumbnail")
            .exec(function(error, users){
                if (error) throw error;
-
-               console.log(users);
-               if (cb) cb(users);
+               if (cb)
+                   cb(users);
            });
     });
     socket.on('create request', function(msg, cb){
@@ -50,7 +49,6 @@ io.sockets.on('connection', function (socket) {
            persistence.User.findByIdAndUpdate(msg.requester._id,{$addToSet: {contacts: rel}},{upsert: true},function(error, user){
                if (error) throw error;
                console.log(user);
-
 
                var rel2 = new persistence.Relationship({relStatus: 'PENDING', user: msg.requester._id, notify: true});
                rel2.save(function(error){
@@ -69,7 +67,6 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('pending requests', function(msg, cb){
-//        console.log(msg);
         persistence.User.findByUsername(msg.username, function(error, user){
             if (error){
                 throw error;
@@ -97,13 +94,13 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('shutdown', function(data){
-        if (data.username in users){
-            var user = users[data.username];
+        if (data._id in users){
+            var user = users[data._id];
             user.info.status = 'OFFLINE';
             notifyContacts(user);
-            delete users[data.username];
+            delete users[data._id];
         }
-    })
+    });
 });
 
 /**
@@ -113,7 +110,7 @@ function parseUser(user){
     var parsedUser = (user.username in users)
         ? users[user.username]
         :{
-            'idUser': user._id,
+            '_id': user._id,
             'username' : user.username,
             'name' : user.name,
             'middlename': user.firstSurname,
@@ -125,19 +122,23 @@ function parseUser(user){
 }
 
 function registerUser(user){
-    if (user.info.username in users){
+
+    if (user.info._id in users){
         user.socket.emit("duplicated session", 'User has started sesion elsewhere');
     }
     else{
         user.info.status = 'ONLINE';
-        users[user.info.username] = user;
+//        users[user.info.username] = user;
+        users[user.info._id] = user;
     }
+
 }
 
 function notifyContacts(user){
     for (var i=0;i<user.contacts.length; i++){
-        var contactName = user.contacts[i].username;
+        var contactName = user.contacts[i].user;
         if (contactName in users){
+            console.log("notifying contact!");
             users[contactName].socket.emit("roster", user.info);
         }
     }
@@ -148,15 +149,16 @@ function notifyContacts(user){
  * */
 function sendOwnContacts(user, callback){
         user.getAllContacts(function(data){
-        console.log(data);
         var parsedContacts = [];
-        for(var i=0;i<data.length;i++){
-          var user;
-          if (data[i].username in users)
-            user = users[data[i].username].info;
-          else
-            user = parseUser(data[i]);
-          parsedContacts.push(user);
+        if (data){
+            for(var i=0;i<data.length;i++){
+              var user;
+              if (data[i]._id in users)
+                user = users[data[i]._id].info;
+              else
+                user = parseUser(data[i]);
+              parsedContacts.push(user);
+            }
         }
         callback(parsedContacts);
     });
