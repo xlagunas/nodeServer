@@ -13,7 +13,6 @@ io.sockets.on('connection', function (socket) {
         socket.set('username', msg.username);
         Persistence.User
         .findOne({username: msg.username})
-//        .populate("pending blocked requested accepted")
         .exec(function(error, loggedUser){
             if (error) {
                 cb({status: 'error',
@@ -29,25 +28,31 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('list contacts:accepted', function(msg, callback){
-        Persistence.User
-            .find({_id: {$in: msg}})
-            .select('-pending -password -accepted -requested -blocked')
-            .exec(function(error, data){
-                if (error) throw error;
-                console.log('contacts found: '+data);
-                callback(data);
-            });
+        if (msg.length >0) {
+            Persistence.User
+                .find({_id: {$in: msg}})
+                .select('-pending -password -accepted -requested -blocked')
+                .exec(function(error, data){
+                    if (error) throw error;
+                    console.log('contacts found: '+data);
+                    callback(data);
+                });
+        }
+        else {
+            callback([]);
+        }
     });
 
-    socket.on('find candidates', function(msg, cb){
-//       Persistence.User.find({username:  new RegExp(msg.username, "i")}).select("_id name firstSurname lastSurname thumbnail email")
-       Persistence.User.find({username:  new RegExp(msg.username, "i")}).select("-password")
+    socket.on('contacts:find', function(msg, cb){
+       Persistence.User.find({username:  new RegExp(msg.username, "i")}).select("-pending -password -accepted -requested -blocked")
            .exec(function(error, users){
                if (error) throw error;
                if (cb)
                    cb(users);
            });
     });
+
+    /**********************************************************************/
     socket.on('create request', function(msg, cb){
 
         var requester = users[msg.requester._id].user;
