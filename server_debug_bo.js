@@ -13,7 +13,6 @@ io.sockets.on('connection', function (socket) {
         socket.set('username', msg.username);
         Persistence.User
         .findOne({username: msg.username})
-//        .populate("pending blocked requested accepted")
         .exec(function(error, loggedUser){
             if (error) {
                 cb({status: 'error',
@@ -25,6 +24,27 @@ io.sockets.on('connection', function (socket) {
             else{
                 cb({status: 'error',data: 'Error password doesn\'t match'});
             }
+        });
+    });
+    socket.on('user:existing', function(msg, cb){
+        Persistence.User
+            .find({username: msg.username})
+            .exec(function(error, data){
+               if (error) throw error;
+               console.log(data);
+               if (data.length == 0){
+                    cb(false);
+               }
+                else
+                    cb(true);
+
+            });
+    });
+    socket.on('user:create', function(msg, cb){
+        var newUser = new Persistence.User(msg);
+        newUser.save(function(error){
+            if (error) throw error;
+            cb(newUser);
         });
     });
 
