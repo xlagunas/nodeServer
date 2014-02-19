@@ -4,13 +4,12 @@ var Mongoose = require('mongoose'),
     io = require('socket.io').listen(3000),
     _ = require('underscore');
 
-Mongoose.connect('mongodb://localhost/v2b_devel');
+Mongoose.connect('mongodb://localhost/v2b_i2cat');
 var users = {};
 io.set('log level', 1); // reduce logging
 
 io.sockets.on('connection', function (socket) {
     socket.on('login', function(msg, cb){
-        socket.set('username', msg.username);
         Persistence.User
         .findOne({username: msg.username})
         .exec(function(error, loggedUser){
@@ -18,6 +17,10 @@ io.sockets.on('connection', function (socket) {
                 cb({status: 'error',
                     error: error})
             }
+
+            socket.set('username', msg.username);
+            socket.set('_id', loggedUser._id);
+
             if (loggedUser.password === msg.password){
                 cb({status: 'success', data: loggedUser});
             }
@@ -31,7 +34,6 @@ io.sockets.on('connection', function (socket) {
             .find({username: msg.username})
             .exec(function(error, data){
                if (error) throw error;
-               console.log(data);
                if (data.length == 0){
                     cb(false);
                }
@@ -40,6 +42,7 @@ io.sockets.on('connection', function (socket) {
 
             });
     });
+
     socket.on('user:create', function(msg, cb){
         var newUser = new Persistence.User(msg);
         newUser.save(function(error){
@@ -48,19 +51,156 @@ io.sockets.on('connection', function (socket) {
         });
     });
 
+    socket.on('contacts:list', function(msg, callback){
+        console.log('contacts:list');
+        socket.get('_id', function(error, _id){
+            if (!error && _id != null){
+                console.log(_id);
+                Persistence
+                    .User
+                    .findById(_id)
+                    .populate({path: 'pending accepted requested blocked', select: 'name username firstSurname lastSurname email thumbnail'})
+                    .exec(function(error, populatedData){
+                        callback({
+                            accepted: populatedData.accepted,
+                            requested: populatedData.requested,
+                            pending: populatedData.pending,
+                            blocked: populatedData.bloked
+                        });
+                    });
+            }
+            else{ console.log(error);}
+        });
+    });
+
+    socket.on('contacts:update_list', function (msg){
+        if (msg){
+            socket.get('_id', function(err, _id){
+                if(!err && _id != null){
+                    Persistence.User.findById(_id).exec(function(err, user){
+                        user[msg.current].pull(msg._id);
+                        user[msg.future].addToSet(msg._id);
+
+                        user.save(function(error){
+                           if (error) throw error;
+                           Persistence.User
+                               .populate(user,
+                                    {   path: 'pending accepted requested blocked',
+                                        select: 'name username firstSurname lastSurname email thumbnail'
+                                    },
+                                    function(error, populatedData){
+                                        socket.emit('contacts:update',
+                                        {
+                                           accepted: populatedData.accepted,
+                                           requested: populatedData.requested,
+                                           pending: populatedData.pending,
+                                           blocked: populatedData.bloked
+                                        });
+                               });
+                        });
+                    });
+                    if (msg.current === 'requested'){
+                        Persistence.User.findById(msg._id).exec(function(err, user2){
+                            if (!err){
+                                console.log(user2);
+                                if(_.contains(user2['pending'], _id)){
+                                    console.log('contains user, go on!');
+                                    user2['pending'].pull(_id);
+                                    user2['accepted'].addToSet(_id);
+                                    user2.save(function(err){
+                                        io.sockets.clients().forEach(function(sock){
+                                            sock.get('_id', function(err, name){
+                                               if (name === user2._id){
+                                                   console.log('_id found!, proceeding to update');
+                                                   Persistence.User
+                                                       .populate(user2,{
+                                                           path: 'pending accepted requested blocked',
+                                                           select: 'name username firstSurname lastSurname email thumbnail'
+                                                       },
+                                                       function(error, populatedData){
+                                                           sock.emit('contacts:update',
+                                                               {
+                                                                   accepted: populatedData.accepted,
+                                                                   requested: populatedData.requested,
+                                                                   pending: populatedData.pending,
+                                                                   blocked: populatedData.bloked
+                                                               });
+                                                       });
+                                               }
+                                            });
+                                        });
+                                    });
+                                }
+                                else{
+                                    console.log('_id not found, it\'s extrange');
+                                }
+                            }
+                        });
+                    }
+                }
+                else{
+                    console.log(error);
+                }
+            });
+        }
+    });
+
     socket.on('list contacts:accepted', function(msg, callback){
-        Persistence.User
-            .find({_id: {$in: msg}})
-            .select('-pending -password -accepted -requested -blocked')
-            .exec(function(error, data){
+        if (msg.length >0) {
+            Persistence.User
+                .find({_id: {$in: msg}})
+                .select('-pending -password -accepted -requested -blocked')
+                .exec(function(error, data){
+                    if (error) throw error;
+                    callback(data);
+                });
+        }
+        else {
+            callback([]);
+        }
+    });
+
+    socket.on('contacts:find', function(msg, cb){
+        Persistence.User.find({username:  new RegExp(msg.username, "i")}).select("-pending -password -accepted -requested -blocked")
+            .exec(function(error, users){
                 if (error) throw error;
-                console.log('contacts found: '+data);
-                callback(data);
+                if (cb)
+                    cb(users);
             });
     });
 
+    socket.on('contacts:propose', function(msg){
+        socket.get('_id', function(error, idProposer){
+            Persistence.User.findOneAndUpdate({_id: idProposer}, {$addToSet:{pending: msg._id}}, function(error, data){
+                if (data){
+                    Persistence.User.populate(data,{path: 'pending', select: 'name username firstSurname lastSurname email thumbnail'} ,function(error, populatedData){
+                        socket.emit('contacts:update', { pending: populatedData.pending });
+                    });
+                }
+            });
+
+            Persistence.User.findOneAndUpdate({_id: msg._id}, {$addToSet:{requested: idProposer}}, function(error, data2){
+                if (data2){
+                    var identifier = {};
+                    identifier = msg._id;
+                    io.sockets.clients().forEach(function(socket){
+                        socket.get('_id', function(err, _id){
+                            if (err)
+                                throw err;
+                            if (identifier === msg._id){
+                                Persistence.User.populate(data2,{path: 'requested', select: 'name username firstSurname lastSurname email thumbnail'} ,function(error, populatedData){
+                                    socket.emit('contacts:update', { requested: populatedData.requested });
+                                });
+                            }
+                        });
+                    });
+                }
+            });
+
+        });
+    });
+ /***** Refactored until here *****/
     socket.on('find candidates', function(msg, cb){
-//       Persistence.User.find({username:  new RegExp(msg.username, "i")}).select("_id name firstSurname lastSurname thumbnail email")
        Persistence.User.find({username:  new RegExp(msg.username, "i")}).select("-password")
            .exec(function(error, users){
                if (error) throw error;
@@ -68,6 +208,7 @@ io.sockets.on('connection', function (socket) {
                    cb(users);
            });
     });
+
     socket.on('create request', function(msg, cb){
 
         var requester = users[msg.requester._id].user;
@@ -303,6 +444,24 @@ function moveContact(user, source, destination, contactId){
     }
     else
     return null;
+}
 
-
+function updateContactsForId(idUser){
+    io.sockets.clients().forEach(function (socket){
+        socket.get('_id', function(err, id){
+            if (err){
+                console.log('podria ser que tingues error');
+                throw error;
+            }
+            if (id === idUser){
+                Persistence.User.findOne({_id: idUser})
+                    .select('pending blocked accepted requested')
+                    .populate('pending blocked accepted requested')
+                    .exec(function (err, contacts){
+                        console.log('contacts:'+ contacts);
+                        socket.emit('contacts:update', contacts);
+                    });
+            }
+        });
+    });
 }
