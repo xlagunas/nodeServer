@@ -2,138 +2,155 @@
 var Mongoose = require('mongoose'),
     Persistence = require('./persistence_debug')
     io = require('socket.io').listen(3000),
-    _ = require('underscore');
+    _ = require('underscore'),
+    ldap = require('./ldap');
 
-Mongoose.connect('mongodb://localhost/v2b_i2cat');
+Mongoose.connect('mongodb://localhost/v2b_devel');
 var users = {};
+
 io.set('log level', 1); // reduce logging
 
+
 io.sockets.on('connection', function (socket) {
-    socket.on('login', function(msg, cb){
-        Persistence.User
-        .findOne({username: msg.username})
-        .exec(function(error, loggedUser){
-            if (error) {
-                cb({status: 'error',
-                    error: error})
-            }
+    function login (msg){
+        if (msg == null || msg.username == null){
+            socket.emit('login',{status: 'error', data: 'Username can\'t be empty!'});
+        }
+        else{
+            Persistence.User.findOne({username: msg.username},function(err, user){
+                if (!err && user != null){
+                    if (user.ldap){
+                        ldap.ldapLogin()
+                    }
+                    else{
+                        if (user.password === msg.password){
+                            socket.set('username', msg.username);
+                            socket.set('id', user.id);
+                            socket.set('status', 'ONLINE');
+                            socket.emit('login',{status: 'success', data: user});
 
-            socket.set('username', msg.username);
-            socket.set('_id', loggedUser._id);
+                            user.accepted.forEach(function(contact){
+                                console.log('subscribing '+user.username+' to '+contact);
+                                socket.join(contact);
+                            });
+                            console.log('broadcasting to Room: '+user.id);
+                            socket.broadcast.to(user.id).emit('roster', {_id: user.id, status: 'ONLINE'});
 
-            if (loggedUser.password === msg.password){
-                cb({status: 'success', data: loggedUser});
-            }
-            else{
-                cb({status: 'error',data: 'Error password doesn\'t match'});
-            }
-        });
-    });
-    socket.on('user:existing', function(msg, cb){
-        Persistence.User
-            .find({username: msg.username})
-            .exec(function(error, data){
-               if (error) throw error;
-               if (data.length == 0){
-                    cb(false);
-               }
-                else
-                    cb(true);
+                        }
+                        else {
+                            socket.emit('login',{status: 'error', data:'Error password doesn\'t match'});
+                        }
+                    }
+                }
+                else{
 
+                    socket.emit('login',{status: 'error', data: 'User '+msg.username+'not found in db'});
+                }
             });
-    });
+        }
+    }
 
-    socket.on('user:create', function(msg, cb){
+    function exists (msg){
+        console.log('checking if user exists...');
+        Persistence.User
+            .find({username: msg.username},
+                function(error, data){
+                    if (error) throw error;
+                    if (data.length == 0){
+                        socket.emit('user:existing', false);
+                    }
+                    else
+                        socket.emit('user:existing', true);
+
+                });
+    }
+
+    function create (msg) {
         var newUser = new Persistence.User(msg);
         newUser.save(function(error){
             if (error) throw error;
-            cb(newUser);
+            socket.emit('user:create',newUser);
         });
-    });
+    }
 
-    socket.on('contacts:list', function(msg, callback){
-        console.log('contacts:list');
-        socket.get('_id', function(error, _id){
+    function listContacts (msg) {
+        socket.get('id', function(error, _id){
             if (!error && _id != null){
-                console.log(_id);
                 Persistence
-                    .User
-                    .findById(_id)
-                    .populate({path: 'pending accepted requested blocked', select: 'name username firstSurname lastSurname email thumbnail'})
-                    .exec(function(error, populatedData){
-                        callback({
+                .User
+                .findById(_id)
+                .populate({path: 'pending accepted requested blocked', select: 'name username firstSurname lastSurname email thumbnail'})
+                .exec(function(error, populatedData){
+                        socket.emit('contacts:update',{
                             accepted: populatedData.accepted,
                             requested: populatedData.requested,
                             pending: populatedData.pending,
-                            blocked: populatedData.bloked
+                            blocked: populatedData.blocked
                         });
                     });
             }
             else{ console.log(error);}
         });
-    });
+    }
+
+    function findNewContacts (msg) {
+        Persistence.User.find({username:  new RegExp(msg.username, "i")}).select("-pending -password -accepted -requested -blocked")
+            .exec(function(error, users){
+                if (error)
+                    throw error;
+                socket.emit('contacts:find', users);
+            });
+    }
+
+    socket.on('login', login);
+
+    socket.on('user:existing', exists);
+
+    socket.on('user:create', create);
+
+    socket.on('contacts:list', listContacts);
 
     socket.on('contacts:update_list', function (msg){
         if (msg){
-            socket.get('_id', function(err, _id){
+            socket.get('id', function(err, _id){
                 if(!err && _id != null){
                     Persistence.User.findById(_id).exec(function(err, user){
-                        user[msg.current].pull(msg._id);
-                        user[msg.future].addToSet(msg._id);
 
-                        user.save(function(error){
-                           if (error) throw error;
-                           Persistence.User
-                               .populate(user,
-                                    {   path: 'pending accepted requested blocked',
-                                        select: 'name username firstSurname lastSurname email thumbnail'
-                                    },
-                                    function(error, populatedData){
-                                        socket.emit('contacts:update',
-                                        {
-                                           accepted: populatedData.accepted,
-                                           requested: populatedData.requested,
-                                           pending: populatedData.pending,
-                                           blocked: populatedData.bloked
-                                        });
-                               });
+                        user.changeRelationStatus(msg.current,msg.future,msg._id,function(error, updatedUser){
+                            console.log('callback del changeRelationStatus');
+                            console.log('updatedUser al callback: '+updatedUser);
+                            socket.emit('contacts:update', {
+                                accepted: updatedUser.accepted,
+                                requested: updatedUser.requested,
+                                pending: updatedUser.pending,
+                                blocked: updatedUser.blocked
+                            } )
                         });
+
+
                     });
                     if (msg.current === 'requested'){
-                        Persistence.User.findById(msg._id).exec(function(err, user2){
+                        console.log('_id:'+_id);
+                        Persistence.User.findById(msg._id).exec(function(err, contact){
                             if (!err){
-                                console.log(user2);
-                                if(_.contains(user2['pending'], _id)){
-                                    console.log('contains user, go on!');
-                                    user2['pending'].pull(_id);
-                                    user2['accepted'].addToSet(_id);
-                                    user2.save(function(err){
-                                        io.sockets.clients().forEach(function(sock){
-                                            sock.get('_id', function(err, name){
-                                               if (name === user2._id){
-                                                   console.log('_id found!, proceeding to update');
-                                                   Persistence.User
-                                                       .populate(user2,{
-                                                           path: 'pending accepted requested blocked',
-                                                           select: 'name username firstSurname lastSurname email thumbnail'
-                                                       },
-                                                       function(error, populatedData){
-                                                           sock.emit('contacts:update',
-                                                               {
-                                                                   accepted: populatedData.accepted,
-                                                                   requested: populatedData.requested,
-                                                                   pending: populatedData.pending,
-                                                                   blocked: populatedData.bloked
-                                                               });
-                                                       });
-                                               }
+                                contact.changeRelationStatus('pending', 'accepted',_id, function(error, updatedContact){
+                                    if (!error){
+                                        //notify contact of the changes;
+                                        io.sockets.clients().forEach(function(contactSocket){
+                                            contactSocket.get('id', function(error, name){
+                                                if (!error && name === updatedContact.id){
+                                                    console.log('callback del changeRelationStatus contact');
+                                                    contactSocket.emit('contacts:update', {
+                                                        accepted: updatedContact.accepted,
+                                                        requested: updatedContact.requested,
+                                                        pending: updatedContact.pending,
+                                                        blocked: updatedContact.blocked
+                                                    });
+                                                }
                                             });
                                         });
-                                    });
-                                }
-                                else{
-                                    console.log('_id not found, it\'s extrange');
-                                }
+                                    }
+                                });
                             }
                         });
                     }
@@ -160,17 +177,10 @@ io.sockets.on('connection', function (socket) {
         }
     });
 
-    socket.on('contacts:find', function(msg, cb){
-        Persistence.User.find({username:  new RegExp(msg.username, "i")}).select("-pending -password -accepted -requested -blocked")
-            .exec(function(error, users){
-                if (error) throw error;
-                if (cb)
-                    cb(users);
-            });
-    });
+    socket.on('contacts:find', findNewContacts);
 
     socket.on('contacts:propose', function(msg){
-        socket.get('_id', function(error, idProposer){
+        socket.get('id', function(error, idProposer){
             Persistence.User.findOneAndUpdate({_id: idProposer}, {$addToSet:{pending: msg._id}}, function(error, data){
                 if (data){
                     Persistence.User.populate(data,{path: 'pending', select: 'name username firstSurname lastSurname email thumbnail'} ,function(error, populatedData){
@@ -184,7 +194,7 @@ io.sockets.on('connection', function (socket) {
                     var identifier = {};
                     identifier = msg._id;
                     io.sockets.clients().forEach(function(socket){
-                        socket.get('_id', function(err, _id){
+                        socket.get('id', function(err, _id){
                             if (err)
                                 throw err;
                             if (identifier === msg._id){
@@ -198,6 +208,19 @@ io.sockets.on('connection', function (socket) {
             });
 
         });
+    });
+
+    socket.on('disconnect', function () {
+        socket.get('id', function(error, id){
+            if (!error){
+                console.log('user: '+id+' disconnected');
+                socket.broadcast.to(id).emit('roster', {_id: id, status: 'OFFLINE'});
+                socket.leave(id);
+            }
+            else{
+                console.log('unknown user disconnected');
+            }
+        })
     });
  /***** Refactored until here *****/
     socket.on('find candidates', function(msg, cb){
@@ -343,10 +366,6 @@ io.sockets.on('connection', function (socket) {
 //        });
     });
 
-    socket.on('disconnect', function () {
-        io.sockets.emit('user disconnected');
-    });
-
     socket.on('shutdown', function(data){
         if (data._id in users){
             var user = users[data._id];
@@ -448,7 +467,7 @@ function moveContact(user, source, destination, contactId){
 
 function updateContactsForId(idUser){
     io.sockets.clients().forEach(function (socket){
-        socket.get('_id', function(err, id){
+        socket.get('id', function(err, id){
             if (err){
                 console.log('podria ser que tingues error');
                 throw error;

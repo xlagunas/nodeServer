@@ -8,8 +8,8 @@
 
 
 var Mongoose = require('mongoose'),
-    _ = require('underscore');
-
+    _ = require('underscore'),
+    ldap = require('ldapjs');
 var userSchema = Mongoose.Schema(
     {
         username: {type: String, index: true, unique: true, required: true},
@@ -24,7 +24,8 @@ var userSchema = Mongoose.Schema(
         blocked: [{ type : Mongoose.Schema.ObjectId, ref : 'User' }],
         requested: [{ type : Mongoose.Schema.ObjectId, ref : 'User' }],
         joinDate: {type: Date, default: Date.now()},
-        thumbnail: {type: String, default: 'profile.png'}
+        thumbnail: {type: String, default: 'profile.png'},
+        ldapAuth: Boolean
     }
 );
 
@@ -52,6 +53,7 @@ userSchema.statics.findByUsername = function(username, cb){
     this.findOne({username: username}, cb);
 }
 
+
 userSchema.methods.changeRelationStatus = function(oldStatus, newStatus, user, cb){
     console.log(user._id);
     var oldContactIds = _.pluck(this[oldStatus],'id');
@@ -61,6 +63,26 @@ userSchema.methods.changeRelationStatus = function(oldStatus, newStatus, user, c
     this[newStatus].addToSet(selectedItems);
 
     this.save(cb);
+
+}
+userSchema.methods.changeRelationStatus = function(oldStatus, newStatus, userId, callback){
+    console.log('Changing relationship Status!');
+
+    if (this[oldStatus].indexOf(userId) != -1){
+        this[oldStatus].pull(userId)
+        this[newStatus].addToSet(userId);
+    }
+
+    this.save(function(error, savedUser, numModified){
+        console.log('savedUser: '+savedUser);
+        if (error)
+            throw error;
+        User.populate(savedUser,
+            {   path: 'pending accepted requested blocked',
+                select: 'name username firstSurname lastSurname email thumbnail'
+            },
+            callback);
+    });
 
 }
 userSchema.methods.toContact = function(){

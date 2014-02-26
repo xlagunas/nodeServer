@@ -1,0 +1,752 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="ceab149a-8d43-41d9-8594-4beccdd285ad" name="Default" comment="debugging in server_debug_bo at root">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ldap.js" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/persistence_debug.js" afterPath="$PROJECT_DIR$/persistence_debug.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server_debug_bo.js" afterPath="$PROJECT_DIR$/server_debug_bo.js" />
+    </list>
+    <ignored path="nodeServer.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <file path="/Dummy.txt" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393436021106" ignored="false" />
+    <file path="/index.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392980716826" ignored="false" />
+    <file path="/app.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392748868186" ignored="false" />
+    <file path="/persistence.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391301193092" ignored="false" />
+    <file path="/app2.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1390572001760" ignored="false" />
+    <file path="/package.json" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1390559521660" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/bower.json" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391097924824" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/app/scripts/services/Websocket.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391098511058" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/app/index.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391098376911" ignored="false" />
+    <file path="/app3.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391443714793" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/app/views/main.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391505420858" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/app/scripts/controllers/main.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391604950872" ignored="false" />
+    <file path="/main.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393235398273" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/app/scripts/controllers/candidates.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391603453888" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/app/scripts/app.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391101311395" ignored="false" />
+    <file path="/candidates.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391603451400" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/app/views/login.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391172730552" ignored="false" />
+    <file path="/login.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392294856398" ignored="false" />
+    <file path="/app4.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391174220451" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/app/views/contact.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391504350680" ignored="false" />
+    <file path="/contact.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391504350680" ignored="false" />
+    <file path="/persistence_new.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391440779908" ignored="false" />
+    <file path="/server.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391508582592" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/app/scripts/controllers/login.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391598638806" ignored="false" />
+    <file path="/login.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393091778820" ignored="false" />
+    <file path="/persistence_debug.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393432988284" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/app/scripts/services/user.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391598338626" ignored="false" />
+    <file path="/user.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391598324369" ignored="false" />
+    <file path="/main.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392826276181" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/app/scripts/controllers/management.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391598412582" ignored="false" />
+    <file path="/management.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392822251760" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/app/styles/main.scss" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391505589869" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/.tmp/styles/main.css" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391505614750" ignored="false" />
+    <file path="/main.scss" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392814155872" ignored="false" />
+    <file path="$USER_HOME$/Desktop/video2browser/app/views/management.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391597953650" ignored="false" />
+    <file path="/management.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392829373023" ignored="false" />
+    <file path="/persistenceTest.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392131540266" ignored="false" />
+    <file path="/server_debug.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1391605425871" ignored="false" />
+    <file path="/UserService.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393106430622" ignored="false" />
+    <file path="/server_debug_bo.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393435088678" ignored="false" />
+    <file path="/UserService_Test.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392132758240" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/index.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392980716826" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/scripts/services/WebsocketService.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392980724318" ignored="false" />
+    <file path="/WebsocketService.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392134259870" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/scripts/controllers/login.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393091785629" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/scripts/app.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392813098839" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/views/main.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392826276181" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/bower.json" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392812555457" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/styles/main.scss" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392814160059" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/views/login.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392305092326" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/.tmp/styles/main.css" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392814430641" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/scripts/services/Underscore.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392136638815" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/scripts/services/UserService.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393106489701" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/scripts/services/RoomService.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392136705382" ignored="false" />
+    <file path="/RoomService.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392136509816" ignored="false" />
+    <file path="/Underscore.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392136612608" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/scripts/controllers/main.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393235400212" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/views/secondary.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392666220528" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/Gruntfile.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392980707130" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/views/landing.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392654277482" ignored="false" />
+    <file path="/socketio.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392369683367" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/.idea/workspace.xml" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392926992464" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/.idea/webResources.xml" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392627356144" ignored="false" />
+    <file path="/photo.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392642537347" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/scripts/directives/photo.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392666522164" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/views/directives/photo.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392651435358" ignored="false" />
+    <file path="/photo.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392651436269" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/views/newUser.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392653900344" ignored="false" />
+    <file path="/newUser.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392653900344" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/scripts/controllers/newUser.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393093460195" ignored="false" />
+    <file path="/newUser.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393093430824" ignored="false" />
+    <file path="/landing.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392654274627" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/views/searchList.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392664846611" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/scripts/controllers/searchList.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392676752206" ignored="false" />
+    <file path="/searchList.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392676754086" ignored="false" />
+    <file path="/searchList.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392664846611" ignored="false" />
+    <file path="/secondary.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392666182187" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/scripts/controllers/management.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393103237919" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/views/management.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392829376958" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/scripts/controllers/calendar.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392814719192" ignored="false" />
+    <file path="/calendar.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392813062556" ignored="false" />
+    <file path="$PROJECT_DIR$/../angularClient/app/views/calendar.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392813430054" ignored="false" />
+    <file path="/calendar.html" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392813406278" ignored="false" />
+    <file path="/api.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1392981806428" ignored="false" />
+    <file path="/ldap.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393435957452" ignored="false" />
+    <file path="/fragment.js" changelist="ceab149a-8d43-41d9-8594-4beccdd285ad" time="1393434672539" ignored="false" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="nodeServer" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="server_debug_bo.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server_debug_bo.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="22" column="39" selection-start="740" selection-end="740" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="persistence_debug.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/persistence_debug.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="178" column="8" selection-start="5564" selection-end="5564" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UserService.js" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/services/UserService.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="31" column="178" selection-start="994" selection-end="994" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ldap.js" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/ldap.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="72" column="2" selection-start="2163" selection-end="2276" vertical-scroll-proportion="0.8287113">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitLogSettings">
+    <option name="myStructureFilterPaths" />
+    <option name="myDateState">
+      <MyDateState />
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/persistence_new.js" />
+        <option value="$PROJECT_DIR$/app3.js" />
+        <option value="$PROJECT_DIR$/server.js" />
+        <option value="$PROJECT_DIR$/server_debug.js" />
+        <option value="$PROJECT_DIR$/node_modules/UserService.js" />
+        <option value="$PROJECT_DIR$/node_modules/services/UserService.js" />
+        <option value="$PROJECT_DIR$/node_modules/tests/UserService_Test.js" />
+        <option value="$PROJECT_DIR$/persistenceTest.js" />
+        <option value="$PROJECT_DIR$/tests/UserService_Test.js" />
+        <option value="$PROJECT_DIR$/services/UserService.js" />
+        <option value="$PROJECT_DIR$/server/server_debug_bo.js" />
+        <option value="$PROJECT_DIR$/socketio.js" />
+        <option value="$PROJECT_DIR$/api.js" />
+        <option value="$PROJECT_DIR$/persistence_debug.js" />
+        <option value="$PROJECT_DIR$/server_debug_bo.js" />
+        <option value="$PROJECT_DIR$/ldap.js" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="y" value="22" />
+    <option name="width" value="1280" />
+    <option name="height" value="1002" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+          <State>
+            <id>DOM issuesJavaScript</id>
+          </State>
+          <State>
+            <id>JavaScript</id>
+          </State>
+          <State>
+            <id>Node.jsJavaScript</id>
+          </State>
+          <State>
+            <id>XPath</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>CoffeeScript</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="0" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents ProjectPane="true" />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="Scope">
+        <subPane subId="Project Files">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="nodeServer">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="nodeServer">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT=".idea">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nodeServer" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nodeServer" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nodeServer" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="options.lastSelected" value="Settings.JavaScript" />
+    <property name="recentsLimit" value="5" />
+    <property name="restartRequiresConfirmation" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/ldap.js" />
+    <property name="FullScreen" value="false" />
+    <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+  </component>
+  <component name="PublishConfig">
+    <servers>
+      <server id="0721b923-dac6-4221-ab79-c61452402dcf">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </server>
+      <server id="3dbe0a29-0aca-4ef7-a225-9a9692c449dc">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </server>
+    </servers>
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/server" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/server" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/node_modules/services" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Node.js.ldap_login">
+    <configuration default="true" type="DartUnitRunConfigurationType" factoryName="DartUnit">
+      <option name="VMOptions" />
+      <option name="arguments" />
+      <option name="filePath" />
+      <option name="scope" value="ALL" />
+      <option name="testName" />
+      <method />
+    </configuration>
+    <configuration default="true" type="NodeunitConfigurationType" factoryName="Nodeunit">
+      <setting name="nodePath" value="/usr/local/bin/node" />
+      <envs />
+      <setting name="passParentEnvVars" value="true" />
+      <setting name="nodeunitModuleDir" value="" />
+      <setting name="workingDirectory" value="$PROJECT_DIR$" />
+      <setting name="testType" value="JS_FILE" />
+      <setting name="jsFile" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="NodeJSRemoteDebug" factoryName="Node.js Remote Debug">
+      <node-js-remote-debug />
+      <method />
+    </configuration>
+    <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/node" path-to-js-file="app4.js" working-dir="$PROJECT_DIR$">
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugSession" factoryName="Remote" singleton="true">
+      <JSRemoteDebuggerConfigurationSettings>
+        <option name="engineId" value="chrome" />
+        <option name="fileUrl" value="" />
+      </JSRemoteDebuggerConfigurationSettings>
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugSession" factoryName="Local" singleton="true">
+      <JSDebuggerConfigurationSettings>
+        <option name="engineId" value="embedded" />
+        <option name="fileUrl" />
+      </JSDebuggerConfigurationSettings>
+      <method />
+    </configuration>
+    <configuration default="false" name="default node" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/node" path-to-js-file="server_debug_bo.js" working-dir="$PROJECT_DIR$">
+      <RunnerSettings RunnerId="NodeJS.debug" />
+      <RunnerSettings RunnerId="NodeJS.run" />
+      <ConfigurationWrapper RunnerId="NodeJS.debug" />
+      <ConfigurationWrapper RunnerId="NodeJS.run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="PersistenceTest" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/node" path-to-js-file="persistence_debug.js" working-dir="$PROJECT_DIR$">
+      <RunnerSettings RunnerId="NodeJS.run" />
+      <ConfigurationWrapper RunnerId="NodeJS.run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="UserService_Test" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/node" path-to-js-file="tests/UserService_Test.js" working-dir="$PROJECT_DIR$">
+      <RunnerSettings RunnerId="NodeJS.debug" />
+      <RunnerSettings RunnerId="NodeJS.run" />
+      <ConfigurationWrapper RunnerId="NodeJS.debug" />
+      <ConfigurationWrapper RunnerId="NodeJS.run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="socketio" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/node" path-to-js-file="socketio.js" working-dir="$PROJECT_DIR$">
+      <RunnerSettings RunnerId="NodeJS.run" />
+      <ConfigurationWrapper RunnerId="NodeJS.run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="ldap_login" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="/usr/local/bin/node" path-to-js-file="ldap.js" working-dir="$PROJECT_DIR$">
+      <RunnerSettings RunnerId="NodeJS.debug" />
+      <RunnerSettings RunnerId="NodeJS.run" />
+      <ConfigurationWrapper RunnerId="NodeJS.debug" />
+      <ConfigurationWrapper RunnerId="NodeJS.run" />
+      <method />
+    </configuration>
+    <list size="5">
+      <item index="0" class="java.lang.String" itemvalue="Node.js.default node" />
+      <item index="1" class="java.lang.String" itemvalue="Node.js.PersistenceTest" />
+      <item index="2" class="java.lang.String" itemvalue="Node.js.UserService_Test" />
+      <item index="3" class="java.lang.String" itemvalue="Node.js.socketio" />
+      <item index="4" class="java.lang.String" itemvalue="Node.js.ldap_login" />
+    </list>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false" SSL_PROTOCOLS="sslv3">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="mySSHConnectionTimeout" value="30000" />
+    <option name="mySSHReadTimeout" value="30000" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="CHECK_NESTED_FOR_QUICK_MERGE" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="FORCE_UPDATE" value="false" />
+    <option name="IGNORE_EXTERNALS" value="false" />
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ceab149a-8d43-41d9-8594-4beccdd285ad" name="Default" comment="" />
+      <created>1390294406076</created>
+      <updated>1390294406076</updated>
+    </task>
+    <task id="LOCAL-00001" summary="playing with mongoose and node.io">
+      <created>1390325935611</created>
+      <updated>1390325935611</updated>
+    </task>
+    <task id="LOCAL-00002" summary="playing with mongoose and node.io">
+      <created>1390478152650</created>
+      <updated>1390478152650</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Created Persistence module, toying with it">
+      <created>1390498532597</created>
+      <updated>1390498532597</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Created Persistence module, toying with it">
+      <created>1390498960105</created>
+      <updated>1390498960105</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Created Persistence module, toying with it">
+      <created>1390499074294</created>
+      <updated>1390499074294</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Added createRelationship and updateRelationship methods">
+      <created>1390572604672</created>
+      <updated>1390572604672</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Added createRelationship and updateRelationship methods">
+      <created>1391097729525</created>
+      <updated>1391097729525</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Added contact finder">
+      <created>1391103626739</created>
+      <updated>1391103626739</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Added contact finder">
+      <created>1391182314469</created>
+      <updated>1391182314469</updated>
+    </task>
+    <task id="LOCAL-00010" summary="debugging in server_debug_bo at root">
+      <created>1392386255218</created>
+      <updated>1392386255218</updated>
+    </task>
+    <task id="LOCAL-00011" summary="debugging in server_debug_bo at root">
+      <created>1392656618433</created>
+      <updated>1392656618433</updated>
+    </task>
+    <task id="LOCAL-00012" summary="debugging in server_debug_bo at root">
+      <created>1392656674040</created>
+      <updated>1392656674040</updated>
+    </task>
+    <task id="LOCAL-00013" summary="debugging in server_debug_bo at root">
+      <created>1392831184806</created>
+      <updated>1392831184806</updated>
+    </task>
+    <task id="LOCAL-00014" summary="debugging in server_debug_bo at root">
+      <created>1392831287716</created>
+      <updated>1392831287716</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
+    <servers />
+  </component>
+  <component name="TodoView" selected-index="3">
+    <todo-panel id="selected-file">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+    <todo-panel id="default-changelist">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="0" y="22" width="1280" height="1002" extended-state="6" />
+    <editor active="false" />
+    <layout>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32977462" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32879817" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2497332" sideWeight="0.6642942" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23014587" sideWeight="0.72675735" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23582767" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.16862327" sideWeight="0.2906287" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39761093" sideWeight="0.5" order="10" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27324262" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.43890867" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="OFFER_MOVE_TO_ANOTHER_CHANGELIST_ON_PARTIAL_COMMIT" value="true" />
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="CHECK_NEW_TODO" value="true" />
+    <option name="myTodoPanelSettings">
+      <value>
+        <are-packages-shown value="false" />
+        <are-modules-shown value="false" />
+        <flatten-packages value="false" />
+        <is-autoscroll-to-source value="false" />
+      </value>
+    </option>
+    <option name="PERFORM_UPDATE_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_COMMIT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_EDIT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_CHECKOUT_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_ADD_REMOVE_IN_BACKGROUND" value="true" />
+    <option name="PERFORM_ROLLBACK_IN_BACKGROUND" value="false" />
+    <option name="CHECK_LOCALLY_CHANGED_CONFLICTS_IN_BACKGROUND" value="false" />
+    <option name="CHANGED_ON_SERVER_INTERVAL" value="60" />
+    <option name="SHOW_ONLY_CHANGED_IN_SELECTION_DIFF" value="true" />
+    <option name="CHECK_COMMIT_MESSAGE_SPELLING" value="true" />
+    <option name="DEFAULT_PATCH_EXTENSION" value="patch" />
+    <option name="SHORT_DIFF_HORIZONTALLY" value="true" />
+    <option name="SHORT_DIFF_EXTRA_LINES" value="2" />
+    <option name="SOFT_WRAPS_IN_SHORT_DIFF" value="true" />
+    <option name="INCLUDE_TEXT_INTO_PATCH" value="false" />
+    <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
+    <option name="SHOW_FILE_HISTORY_DETAILS" value="true" />
+    <option name="SHOW_VCS_ERROR_NOTIFICATIONS" value="true" />
+    <option name="SHOW_DIRTY_RECURSIVELY" value="false" />
+    <option name="LIMIT_HISTORY" value="true" />
+    <option name="MAXIMUM_HISTORY_ROWS" value="1000" />
+    <option name="UPDATE_FILTER_SCOPE_NAME" />
+    <option name="USE_COMMIT_MESSAGE_MARGIN" value="false" />
+    <option name="COMMIT_MESSAGE_MARGIN_SIZE" value="72" />
+    <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
+    <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
+    <option name="LAST_COMMIT_MESSAGE" value="debugging in server_debug_bo at root" />
+    <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
+    <option name="FILE_HISTORY_DIALOG_COMMENTS_SPLITTER_PROPORTION" value="0.8" />
+    <option name="FILE_HISTORY_DIALOG_SPLITTER_PROPORTION" value="0.5" />
+    <option name="ACTIVE_VCS_NAME" />
+    <option name="UPDATE_GROUP_BY_PACKAGES" value="false" />
+    <option name="UPDATE_GROUP_BY_CHANGELIST" value="false" />
+    <option name="UPDATE_FILTER_BY_SCOPE" value="false" />
+    <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
+    <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
+    <MESSAGE value="playing with mongoose and node.io" />
+    <MESSAGE value="Created Persistence module, toying with it" />
+    <MESSAGE value="Added createRelationship and updateRelationship methods" />
+    <MESSAGE value="Added contact finder" />
+    <MESSAGE value="debugging in server_debug_bo at root" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/server_debug.js</url>
+          <line>132</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/server_debug.js</url>
+          <line>159</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/services/UserService.js</url>
+          <line>67</line>
+          <option name="timeStamp" value="50" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/services/UserService.js</url>
+          <line>49</line>
+          <option name="timeStamp" value="51" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$USER_HOME$/node_modules/ldapjs/lib/client/client.js</url>
+          <line>345</line>
+          <option name="timeStamp" value="92" />
+        </line-breakpoint>
+      </breakpoints>
+      <breakpoints-dialog>
+        <breakpoints-dialog />
+      </breakpoints-dialog>
+      <option name="time" value="93" />
+    </breakpoint-manager>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/tests/UserService_Test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="55" column="0" selection-start="1247" selection-end="1247" vertical-scroll-proportion="0.8128898" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/persistenceTest.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="82" column="41" selection-start="2248" selection-end="2248" vertical-scroll-proportion="0.73596674">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server_debug.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="296" column="0" selection-start="10073" selection-end="10073" vertical-scroll-proportion="8.089888">
+          <folding>
+            <element signature="e#1580#1963#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app2.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app3.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="41" selection-start="185" selection-end="229" vertical-scroll-proportion="0.098684214">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="8" column="52" selection-start="0" selection-end="265" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/server_debug_bo.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="41" selection-start="78" selection-end="78" vertical-scroll-proportion="0.047694754">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="21" selection-start="267" selection-end="318" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/socketio.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="26" selection-start="711" selection-end="711" vertical-scroll-proportion="0.5707763" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/.name">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_modules/socket.io/lib/stores/memory.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="86" column="0" selection-start="1128" selection-end="1128" vertical-scroll-proportion="0.33333334" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/persistence_debug.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="178" column="8" selection-start="5564" selection-end="5564" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/UserService.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="178" selection-start="994" selection-end="994" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/node_modules/ldapjs/lib/client/client.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="345" column="0" selection-start="9561" selection-end="9561" vertical-scroll-proportion="0.35073408">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server_debug_bo.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="39" selection-start="740" selection-end="740" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ldap.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="72" column="2" selection-start="2163" selection-end="2276" vertical-scroll-proportion="0.8287113">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
+
