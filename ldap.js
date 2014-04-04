@@ -24,7 +24,7 @@ exports.ldapLogin = function(username, password, callback) {
                 username: entry.object.uid,
                 name: entry.object.givenName,
                 firstSurname: entry.object.sn,
-                secondSurname: entry.object['x-cognom2'],
+                lastSurname: entry.object['x-cognom2'],
                 email: entry.object.mail
             }
         });
@@ -36,7 +36,7 @@ exports.ldapLogin = function(username, password, callback) {
         res.on('error', function(err) {
             console.error('error: ' + err.message);
             if (callback)
-                callback({err: error.name, msg: 'Error generic en català per controlar'});
+                callback({status: 'error', msg: 'Error generic en català per controlar'});
         });
 
         res.on('end', function(result) {
@@ -49,25 +49,51 @@ exports.ldapLogin = function(username, password, callback) {
                         console.log(error.name);
                         console.log(error.message);
                         if (callback)
-                            callback({err: error.name, msg:error.message});
+                            callback({status: 'error', msg:error.message});
                     }
                     else{
                         if (callback)
-                            callback(null,user);
+                            callback({status: 'success', user: user});
                     }
                 });
             }
             else{
                 if (callback)
-                    callback({err: 'UserNotFoundError', msg: 'User not found in LDAP directory'});
+                    callback({status: 'error', msg: 'User not found in LDAP directory'});
             }
         });
     });
 }
 
+exports.existsLdap = function(username, callback) {
+    var opts = {
+        filter: '(&(objectclass=person)(uid='+username+'))',
+        scope: 'sub'
+    }
+    client.search(ldapFilter.ou+','+ldapFilter.dc, opts, function(err, res){
+        var dn;
 
-//this.ldapLogin('xavier_lagunas', '26038786');
-this.ldapLogin('xavier_lagunas', '26038786', function(err, user){
-    console.log(err);
-    console.log(user);
-});
+        if (err)
+            console.log(err);
+
+        res.on('searchEntry', function(entry) {
+            dn = entry.objectName;
+        });
+
+        res.on('error', function(err) {
+            console.error('error: ' + err.message);
+            if (callback)
+                callback({status: 'error', msg: 'Error generic en català per controlar'});
+        });
+
+        res.on('end', function(result) {
+            if(dn){
+                callback(true);
+            }
+            else{
+                callback(false);
+            }
+        });
+    });
+}
+
