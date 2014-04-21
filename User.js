@@ -106,7 +106,7 @@ userSchema.statics.findMatchingUsers = function(matchingUsername, callback){
         });
 }
 
-userSchema.statics.swapRelation = function (idUser, idContact, currentStatus, futureStatus,callback){
+userSchema.statics.swapRelation = function (idUser, idContact, currentStatus, futureStatus, callback){
     this.findById(idUser, function(error, user){
         if (!error){
             if (user){

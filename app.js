@@ -1,18 +1,28 @@
 
 var express = require('express'),
-	app = express(),
+    app = express(),
     fs = require('fs'),
-	server = require('http').createServer(app),
-	io = require('socket.io').listen(server),
-	Mongoose = require('mongoose'),
+//    /* Server sense ssl
+//    server = require('http').createServer(app),
+//     */
+    /* Server amb ssl*/
+    http = require('http').createServer(app),
+    server  = require('https')
+        .createServer(
+        {
+            key: fs.readFileSync('./selfCertificate/server.key'),
+            cert: fs.readFileSync('./selfCertificate/server.crt')
+        },app),
+    io = require('socket.io').listen(server),
+    Mongoose = require('mongoose'),
     User = require('./User').User,
     CalendarEvent = require('./CalEvent').CalendarEvent,
     Call = require('./Call').Call,
     _ = require('underscore');
-	nodemailer = require('nodemailer'),
+    nodemailer = require('nodemailer'),
     clients = {};
-
-server.listen(3000);
+server.listen(443);
+//server.listen(8000);
 Mongoose.connect('mongodb://localhost/v2b_devel')
 
 app.get('/', rootGetRequest);
@@ -78,7 +88,8 @@ io.sockets.on('connection', function(socket){
         console.log('./'+msg.username+'.png');
 
         fs.writeFile('./app/images/'+msg.username+'.png', msg.thumbnail.replace(/^data:image\/png;base64,/,''), 'base64', function(err) {
-            console.log(err);
+            if (err)
+                console.log(err);
         });
         User.create(msg, function(error, newUser){
             if (error) throw error;
@@ -130,37 +141,53 @@ io.sockets.on('connection', function(socket){
     socket.on('contacts:update_list', function (msg){
         console.log('Entra al contacts:update_list')
         if (msg){
-            socket.get('id', function(err, id){
-                if(!err && id != null){
-                    User.swapRelation(id, msg._id, msg.current,msg.future,function(error, updatedUser){
-                        if (!error){
-                            socket.emit('contacts:update', {
-                                accepted:   updatedUser.accepted,
-                                requested:  updatedUser.requested,
-                                pending:    updatedUser.pending,
-                                blocked:    updatedUser.blocked
-                            });
-                        }
-                    });
-                    if (msg.current === 'requested' && msg.future === 'accepted'){
-                        User.swapRelation(msg._id, id, 'pending', 'accepted',function(error, updatedContact){
-                            if (!error){
-                                io.sockets.clients().forEach(function(contactSocket){
-                                    contactSocket.get('id', function(error, name){
-                                        if (!error && name === updatedContact.id){
-                                            console.log('callback del changeRelationStatus contact');
-                                            contactSocket.emit('contacts:update', {
-                                                accepted:   updatedContact.accepted,
-                                                requested:  updatedContact.requested,
-                                                pending:    updatedContact.pending,
-                                                blocked:    updatedContact.blocked
-                                            });
-                                        }
+            socket.get('status', function(err, status){
+                if (!err && status != null) {
+                    console.log('status: '+status);
+
+                    socket.get('id', function (err, id) {
+                        if (!err && id != null) {
+                            User.swapRelation(id, msg._id, msg.current, msg.future, function (error, updatedUser) {
+                                if (!error) {
+                                    socket.emit('contacts:update', {
+                                        accepted: updatedUser.accepted,
+                                        requested: updatedUser.requested,
+                                        pending: updatedUser.pending,
+                                        blocked: updatedUser.blocked
                                     });
+                                }
+                                socket.join(msg._id);
+                            });
+                            if (msg.current === 'requested' && msg.future === 'accepted') {
+                                User.swapRelation(msg._id, id, 'pending', 'accepted', function (error, updatedContact) {
+                                    if (!error) {
+                                        io.sockets.clients().forEach(function (contactSocket) {
+                                            contactSocket.get('id', function (error, name) {
+                                                if (!error && name === updatedContact.id) {
+                                                    console.log('callback del changeRelationStatus contact');
+                                                    contactSocket.emit('contacts:update', {
+                                                        accepted: updatedContact.accepted,
+                                                        requested: updatedContact.requested,
+                                                        pending: updatedContact.pending,
+                                                        blocked: updatedContact.blocked
+                                                    });
+
+                                                    //When all is set up, both users attach to their contact's channel and send their status
+                                                    contactSocket.join(id);
+                                                    socket.broadcast.to(msg._id).emit('roster:update', {id: id, status: status});
+                                                    contactSocket.get('status', function (error, status2){
+                                                        if (!error && status !== null)
+                                                            contactSocket.broadcast.to(id).emit('roster:update', {id: msg._id, status: status2});
+                                                    });
+                                                }
+
+                                            });
+                                        });
+                                    }
                                 });
                             }
-                        });
-                    }
+                        }
+                    });
                 }
             });
         }
@@ -390,7 +417,20 @@ io.sockets.on('connection', function(socket){
                 });
             }
         });
+    });
 
+    socket.on('call:unregister', function(msg){
+        socket.get('id', function(err, id){
+            if (!err && id){
+                User.findById(id, function(err2, user){
+                    if (!err2 && user){
+                        console.log('user: '+id+' left call room: '+msg.id);
+                        socket.broadcast.to('call:'+msg.id).emit('call:removeUser', user);
+                        socket.leave('call:'+msg.id);
+                    }
+                });
+            }
+        });
     });
 
     socket.on('call:userDetails', function(msg){
@@ -412,6 +452,13 @@ io.sockets.on('connection', function(socket){
                     });
             }
         });
+    });
+
+
+    socket.on('call:hangup', function (msg){
+        console.log('call:hangup, Room id: '+msg.id);
+        var rooms = io.sockets.manager.roomClients[socket.id];
+            console.log(rooms);
     });
 
     socket.on('webrtc:offer', function(msg){
