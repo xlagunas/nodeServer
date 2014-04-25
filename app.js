@@ -2,17 +2,18 @@
 var express = require('express'),
     app = express(),
     fs = require('fs'),
+    async = require('async'),
 //    /* Server sense ssl
-//    server = require('http').createServer(app),
+    server = require('http').createServer(app),
 //     */
     /* Server amb ssl*/
-    http = require('http').createServer(app),
-    server  = require('https')
-        .createServer(
-        {
-            key: fs.readFileSync('./selfCertificate/server.key'),
-            cert: fs.readFileSync('./selfCertificate/server.crt')
-        },app),
+//    http = require('http').createServer(app),
+//    server  = require('https')
+//        .createServer(
+//        {
+//            key: fs.readFileSync('./selfCertificate/server.key'),
+//            cert: fs.readFileSync('./selfCertificate/server.crt')
+//        },app),
     io = require('socket.io').listen(server),
     Mongoose = require('mongoose'),
     User = require('./User').User,
@@ -21,8 +22,8 @@ var express = require('express'),
     _ = require('underscore');
     nodemailer = require('nodemailer'),
     clients = {};
-server.listen(443);
-//server.listen(8000);
+//server.listen(443);
+server.listen(8000);
 Mongoose.connect('mongodb://localhost/v2b_devel')
 
 app.get('/', rootGetRequest);
@@ -91,6 +92,7 @@ io.sockets.on('connection', function(socket){
             if (err)
                 console.log(err);
         });
+        msg.thumbnail = msg.username +'.png';
         User.create(msg, function(error, newUser){
             if (error) throw error;
             socket.emit('user:create', newUser);
@@ -137,33 +139,43 @@ io.sockets.on('connection', function(socket){
                 console.log(error);
         });
     });
-
     socket.on('contacts:update_list', function (msg){
-        console.log('Entra al contacts:update_list')
-        if (msg){
-            socket.get('status', function(err, status){
-                if (!err && status != null) {
-                    console.log('status: '+status);
-
-                    socket.get('id', function (err, id) {
-                        if (!err && id != null) {
-                            User.swapRelation(id, msg._id, msg.current, msg.future, function (error, updatedUser) {
-                                if (!error) {
-                                    socket.emit('contacts:update', {
-                                        accepted: updatedUser.accepted,
-                                        requested: updatedUser.requested,
-                                        pending: updatedUser.pending,
-                                        blocked: updatedUser.blocked
-                                    });
-                                }
-                                socket.join(msg._id);
-                            });
-                            if (msg.current === 'requested' && msg.future === 'accepted') {
+        console.log('Entra al contacts:update_list');
+        //If its an accept request, update own status and remote, also add each user to to its contact room on success
+        socket.get('id', function(err, id){
+            if (!err){
+                if (msg.current === 'requested' && msg.future === 'accepted') {
+                    async.parallel([
+                            function (callback) {
+                                User.swapRelation(id, msg._id, msg.current, msg.future, function (err, updatedUser) {
+                                    if (err) {
+                                        callback(err, 'updateError');
+                                    }
+                                    else {
+                                        socket.emit('contacts:update', {
+                                            accepted: updatedUser.accepted,
+                                            requested: updatedUser.requested,
+                                            pending: updatedUser.pending,
+                                            blocked: updatedUser.blocked
+                                        });
+                                        callback(null, {socket: id, joinTo: msg._id});
+                                    }
+                                });
+                            },
+                            function (callback) {
                                 User.swapRelation(msg._id, id, 'pending', 'accepted', function (error, updatedContact) {
-                                    if (!error) {
+                                    if (err){
+                                        callback(err, 'updateError');
+                                    }
+                                    else{
+                                        var found = false;
                                         io.sockets.clients().forEach(function (contactSocket) {
                                             contactSocket.get('id', function (error, name) {
-                                                if (!error && name === updatedContact.id) {
+                                                if (error){
+                                                    callback(error, 'idError iterating');
+                                                }
+                                                else if (name === updatedContact.id) {
+                                                    found = true;
                                                     console.log('callback del changeRelationStatus contact');
                                                     contactSocket.emit('contacts:update', {
                                                         accepted: updatedContact.accepted,
@@ -171,30 +183,123 @@ io.sockets.on('connection', function(socket){
                                                         pending: updatedContact.pending,
                                                         blocked: updatedContact.blocked
                                                     });
-
-                                                    //When all is set up, both users attach to their contact's channel and send their status
-                                                    contactSocket.join(id);
-                                                    socket.broadcast.to(msg._id).emit('roster:update', {id: id, status: status});
-                                                    contactSocket.get('status', function (error, status2){
-                                                        if (!error && status !== null)
-                                                            contactSocket.broadcast.to(id).emit('roster:update', {id: msg._id, status: status2});
-                                                    });
+                                                    callback(null, {socket: msg._id, joinTo: id});
                                                 }
-
                                             });
                                         });
+                                        if (!found)
+                                            callback('Error', 'iterator not found');
+
                                     }
                                 });
                             }
+                        ],
+                        function (error, results) {
+                            if (error)
+                                console.log(error);
+                            else{
+
+                                results[0].socket.join(results[0].joinTo);
+                                results[1].socket.join(results[1].joinTo);
+                                results[0].socket.get('id', function(err, id1){
+                                    if (!err){
+                                        results[0].socket.get('status', function(err, status){
+                                            if (!err){
+                                                console.log({id: id1, status: status});
+                                                results[1].socket.emit('roster:update', {id: id1, status: status});
+                                            }
+                                        });
+
+                                    }
+                                });
+                                results[1].socket.get('id', function(err, id2){
+                                    if (!err){
+                                        results[1].socket.get('status', function(err, status){
+                                            if (!err){
+                                                console.log({id: id2, status: status});
+                                                results[0].socket.emit('roster:update', {id: id2, status: status});
+                                            }
+                                        });
+
+                                    }
+                                });
+                            }
+                        });
+                }
+                //If its not an accept request, simply update it and return it back
+                else{
+                    User.swapRelation(id, msg._id, msg.current, msg.future, function (err, updatedUser){
+                        if (!err){
+                            socket.emit('contacts:update', {
+                                accepted: updatedUser.accepted,
+                                requested: updatedUser.requested,
+                                pending: updatedUser.pending,
+                                blocked: updatedUser.blocked
+                            });
                         }
                     });
                 }
-            });
-        }
-        else {
-            console.log('error al contacts:update_list')
-        }
+            }
+        });
+
     });
+//    socket.on('contacts:update_list_2', function (msg){
+//        console.log('Entra al contacts:update_list')
+//        if (msg){
+//            socket.get('status', function(err, status){
+//                if (!err && status != null) {
+//                    console.log('status: '+status);
+//
+//                    socket.get('id', function (err, id) {
+//                        if (!err && id != null) {
+//                            User.swapRelation(id, msg._id, msg.current, msg.future, function (error, updatedUser) {
+//                                if (!error) {
+//                                    socket.emit('contacts:update', {
+//                                        accepted: updatedUser.accepted,
+//                                        requested: updatedUser.requested,
+//                                        pending: updatedUser.pending,
+//                                        blocked: updatedUser.blocked
+//                                    });
+//                                }
+//                                socket.join(msg._id);
+//                            });
+//                            if (msg.current === 'requested' && msg.future === 'accepted') {
+//                                User.swapRelation(msg._id, id, 'pending', 'accepted', function (error, updatedContact) {
+//                                    if (!error) {
+//                                        io.sockets.clients().forEach(function (contactSocket) {
+//                                            contactSocket.get('id', function (error, name) {
+//                                                if (!error && name === updatedContact.id) {
+//                                                    console.log('callback del changeRelationStatus contact');
+//                                                    contactSocket.emit('contacts:update', {
+//                                                        accepted: updatedContact.accepted,
+//                                                        requested: updatedContact.requested,
+//                                                        pending: updatedContact.pending,
+//                                                        blocked: updatedContact.blocked
+//                                                    });
+//
+//                                                    //When all is set up, both users attach to their contact's channel and send their status
+//                                                    contactSocket.join(id);
+//                                                    socket.broadcast.to(msg._id).emit('roster:update', {id: id, status: status});
+//                                                    contactSocket.get('status', function (error, status2){
+//                                                        if (!error && status !== null)
+//                                                            contactSocket.broadcast.to(id).emit('roster:update', {id: msg._id, status: status2});
+//                                                    });
+//                                                }
+//
+//                                            });
+//                                        });
+//                                    }
+//                                });
+//                            }
+//                        }
+//                    });
+//                }
+//            });
+//        }
+//        else {
+//            console.log('error al contacts:update_list')
+//        }
+//    });
 
     socket.on('list contacts:accepted', function(msg, callback){
         if (msg.length >0) {
