@@ -39,6 +39,7 @@ function rootGetRequest(req, res){
 io.set('log level', 1); // reduce logging
 
 io.sockets.on('connection', function(socket){
+
     socket.on('login', function(msg){
         if (msg && msg.username && msg.password){
             User.login(msg.username, msg.password, function(data){
@@ -54,30 +55,17 @@ io.sockets.on('connection', function(socket){
         }
     });
 
-    socket.on('roster:ack', function (msg){
+    socket.on('roster:ack', function (msg) {
         console.log('roster:ack');
-        socket.get('id', function(error, idSender){
-            if (!error && idSender){
-                console.log('sender: '+idSender);
-                io.sockets.clients(idSender).forEach(function(socketContact){
-                    socketContact.get('id', function(error, idReceiver){
-                        //Swap id; the receiver will get sender's id instead of its own
-                        console.log('receiver: '+idReceiver);
-                        if (idReceiver === msg.id){
-                            socket.get('status', function(error, status){
-                                if (!error && status){
-                                    var newMsg = {id: idSender, status: status};
-                                    console.log('envio ack a: '+idReceiver);
-                                    socketContact.emit('roster:ack', newMsg);
-                                }
-                            });
-
-                        }
-                    });
+        getSocketProperty(socket, 'id', function (idProposer) {
+            getSocketProperty(socket, 'status', function (status) {
+                findContactSocketById(idProposer, msg.id, function (socketContact) {
+                    socketContact.emit('roster:ack', {id: idProposer, status: status});
                 });
-            }
+            });
         });
     });
+
 
     socket.on('user:existing', function (msg){
         User.exists(msg.username, function(exists){
@@ -103,144 +91,165 @@ io.sockets.on('connection', function(socket){
     //extension = png/
     socket.on('user:changeImage', function (msg){
         console.log('user:changeImage');
-        socket.get('id', function(err, id) {
-            if (!err && id){
-                fs.writeFile('./app/images/'+msg.username+'.png', msg.thumbnail.replace(/^data:image\/png;base64,/,''), 'base64', function(err) {
-                    if (!err){
-                        User.findById(id, function(err, user){
-                            user.thumbnail = '/images/'+msg.username+'.'+msg.extension;
-                            user.save(function (err){
-                                if (!err)
-                                    socket.emit('user:changeImage', user.thumbnail);
-                            });
+        getSocketProperty(socket, 'id', function (id){
+            fs.writeFile('./app/images/'+msg.username+'.png', msg.thumbnail.replace(/^data:image\/png;base64,/,''), 'base64', function(err) {
+                if (!err){
+                    User.findById(id, function(err, user){
+                        user.thumbnail = '/images/'+msg.username+'.'+msg.extension;
+                        user.save(function (err){
+                            if (!err)
+                                socket.emit('user:changeImage', user.thumbnail);
                         });
-                    }
-                });
-            }
+                    });
+                }
+            });
         });
     });
 
     socket.on('contacts:list', function(msg){
-        socket.get('id', function(error, id){
-            if (!error && id != null){
-                User.listContacts(id, function(data){
-                    if (data){
-                        socket.emit('contacts:update', data);
-                        data.accepted.forEach(function(contact){
-                            console.log('subscribing user: '+id+' to '+contact.id);
-                            socket.join(contact.id);
-                        });
-                        console.log('broadcasting to Room: '+id);
-                        socket.broadcast.to(id).emit('roster:update', {id: id, status: 'ONLINE'});
-                    }
-                });
-            }
-            else
-                console.log(error);
+        getSocketProperty(socket, 'id', function (id){
+            User.listContacts(id, function(data){
+                if (data){
+                    socket.emit('contacts:update', data);
+                    data.accepted.forEach(function(contact){
+                        console.log('subscribing user: '+id+' to '+contact.id);
+                        socket.join(contact.id);
+                    });
+                    console.log('broadcasting to Room: '+id);
+                    socket.broadcast.to(id).emit('roster:update', {id: id, status: 'ONLINE'});
+                }
+            });
         });
     });
+
     socket.on('contacts:update_list', function (msg){
         console.log('Entra al contacts:update_list');
         //If its an accept request, update own status and remote, also add each user to to its contact room on success
-        socket.get('id', function(err, id){
-            if (!err){
-                if (msg.current === 'requested' && msg.future === 'accepted') {
-                    async.parallel([
-                            function (callback) {
-                                User.swapRelation(id, msg._id, msg.current, msg.future, function (err, updatedUser) {
-                                    if (err) {
-                                        callback(err, 'updateError');
-                                    }
-                                    else {
-                                        socket.emit('contacts:update', {
-                                            accepted: updatedUser.accepted,
-                                            requested: updatedUser.requested,
-                                            pending: updatedUser.pending,
-                                            blocked: updatedUser.blocked
-                                        });
-                                        callback(null, {socket: id, joinTo: msg._id});
-                                    }
-                                });
-                            },
-                            function (callback) {
-                                User.swapRelation(msg._id, id, 'pending', 'accepted', function (error, updatedContact) {
-                                    if (err){
-                                        callback(err, 'updateError');
-                                    }
-                                    else{
-                                        var found = false;
-                                        io.sockets.clients().forEach(function (contactSocket) {
-                                            contactSocket.get('id', function (error, name) {
-                                                if (error){
-                                                    callback(error, 'idError iterating');
-                                                }
-                                                else if (name === updatedContact.id) {
-                                                    found = true;
-                                                    console.log('callback del changeRelationStatus contact');
-                                                    contactSocket.emit('contacts:update', {
-                                                        accepted: updatedContact.accepted,
-                                                        requested: updatedContact.requested,
-                                                        pending: updatedContact.pending,
-                                                        blocked: updatedContact.blocked
-                                                    });
-                                                    callback(null, {socket: msg._id, joinTo: id});
-                                                }
-                                            });
-                                        });
-                                        if (!found)
-                                            callback('Error', 'iterator not found');
-
-                                    }
-                                });
-                            }
-                        ],
-                        function (error, results) {
-                            if (error)
-                                console.log(error);
-                            else{
-
-                                results[0].socket.join(results[0].joinTo);
-                                results[1].socket.join(results[1].joinTo);
-                                results[0].socket.get('id', function(err, id1){
-                                    if (!err){
-                                        results[0].socket.get('status', function(err, status){
-                                            if (!err){
-                                                console.log({id: id1, status: status});
-                                                results[1].socket.emit('roster:update', {id: id1, status: status});
-                                            }
-                                        });
-
-                                    }
-                                });
-                                results[1].socket.get('id', function(err, id2){
-                                    if (!err){
-                                        results[1].socket.get('status', function(err, status){
-                                            if (!err){
-                                                console.log({id: id2, status: status});
-                                                results[0].socket.emit('roster:update', {id: id2, status: status});
-                                            }
-                                        });
-
-                                    }
-                                });
-                            }
+        getSocketProperty(socket, 'id', function (id){
+            if (msg.current === 'requested' && msg.future === 'accepted') {
+                async.parallel([
+                    function(callback){
+                        UpdateAndNotifyRelationship(socket, msg._id, msg.current, msg.future, callback(null, {socket: socket, joinTo: msg._id}));
+                    },
+                    function(callback){
+                        findSocketById(msg._id, function (contactSocket){
+                            UpdateAndNotifyRelationship(contactSocket, id, 'pending', 'accepted', callback(null, {socket: contactSocket, joinTo: id}));
                         });
-                }
-                //If its not an accept request, simply update it and return it back
-                else{
-                    User.swapRelation(id, msg._id, msg.current, msg.future, function (err, updatedUser){
-                        if (!err){
-                            socket.emit('contacts:update', {
-                                accepted: updatedUser.accepted,
-                                requested: updatedUser.requested,
-                                pending: updatedUser.pending,
-                                blocked: updatedUser.blocked
-                            });
-                        }
-                    });
-                }
+                    }
+                ],  function (error, results) {
+                    if (!error){
+                        results[0].socket.join(results[0].joinTo);
+                        results[1].socket.join(results[1].joinTo);
+                        sendRosterUpdate(results[0].socket, results[1].socket);
+                        sendRosterUpdate(results[1].socket, results[0].socket);
+
+                    }
+                });
+            } else {
+                UpdateAndNotifyRelationship(socket, msg._id, msg.current, msg.future);
             }
         });
+
+
+//        socket.get('id', function(err, id){
+//            if (!err){
+//                if (msg.current === 'requested' && msg.future === 'accepted') {
+//                    async.parallel([
+//                            function (callback) {
+//                                User.swapRelation(id, msg._id, msg.current, msg.future, function (err, updatedUser) {
+//                                    if (err) {
+//                                        callback(err, 'updateError');
+//                                    }
+//                                    else {
+//                                        socket.emit('contacts:update', {
+//                                            accepted: updatedUser.accepted,
+//                                            requested: updatedUser.requested,
+//                                            pending: updatedUser.pending,
+//                                            blocked: updatedUser.blocked
+//                                        });
+//                                        callback(null, {socket: id, joinTo: msg._id});
+//                                    }
+//                                });
+//                            },
+//                            function (callback) {
+//                                User.swapRelation(msg._id, id, 'pending', 'accepted', function (error, updatedContact) {
+//                                    if (err){
+//                                        callback(err, 'updateError');
+//                                    }
+//                                    else{
+//                                        var found = false;
+//                                        io.sockets.clients().forEach(function (contactSocket) {
+//                                            contactSocket.get('id', function (error, name) {
+//                                                if (error){
+//                                                    callback(error, 'idError iterating');
+//                                                }
+//                                                else if (name === updatedContact.id) {
+//                                                    found = true;
+//                                                    console.log('callback del changeRelationStatus contact');
+//                                                    contactSocket.emit('contacts:update', {
+//                                                        accepted: updatedContact.accepted,
+//                                                        requested: updatedContact.requested,
+//                                                        pending: updatedContact.pending,
+//                                                        blocked: updatedContact.blocked
+//                                                    });
+//                                                    callback(null, {socket: msg._id, joinTo: id});
+//                                                }
+//                                            });
+//                                        });
+//                                        if (!found)
+//                                            callback('Error', 'iterator not found');
+//
+//                                    }
+//                                });
+//                            }
+//                        ],
+//                        function (error, results) {
+//                            if (error)
+//                                console.log(error);
+//                            else{
+//
+//                                results[0].socket.join(results[0].joinTo);
+//                                results[1].socket.join(results[1].joinTo);
+//                                results[0].socket.get('id', function(err, id1){
+//                                    if (!err){
+//                                        results[0].socket.get('status', function(err, status){
+//                                            if (!err){
+//                                                console.log({id: id1, status: status});
+//                                                results[1].socket.emit('roster:update', {id: id1, status: status});
+//                                            }
+//                                        });
+//
+//                                    }
+//                                });
+//                                results[1].socket.get('id', function(err, id2){
+//                                    if (!err){
+//                                        results[1].socket.get('status', function(err, status){
+//                                            if (!err){
+//                                                console.log({id: id2, status: status});
+//                                                results[0].socket.emit('roster:update', {id: id2, status: status});
+//                                            }
+//                                        });
+//
+//                                    }
+//                                });
+//                            }
+//                        });
+//                }
+//                //If its not an accept request, simply update it and return it back
+//                else{
+//                    User.swapRelation(id, msg._id, msg.current, msg.future, function (err, updatedUser){
+//                        if (!err){
+//                            socket.emit('contacts:update', {
+//                                accepted: updatedUser.accepted,
+//                                requested: updatedUser.requested,
+//                                pending: updatedUser.pending,
+//                                blocked: updatedUser.blocked
+//                            });
+//                        }
+//                    });
+//                }
+//            }
+//        });
 
     });
 //    socket.on('contacts:update_list_2', function (msg){
@@ -419,123 +428,200 @@ io.sockets.on('connection', function(socket){
         }
     });
 
-    socket.on('call:invite', function(msg){
-        console.log('call:invite');
-        socket.get('id', function(err, idProposer){
-            if (!err && idProposer){
-                io.sockets.clients().forEach(function(contact){
-                    contact.get('id', function(err2, idContact){
-                        if (!err2 && idContact){
-                            if (idContact === msg.id){
-                                if (msg.call.type === 'CREATE'){
-                                    console.log('create');
-                                    Call.create({caller: idProposer, callee: [idContact]}, function(error, call){
-                                        if (!error && call){
-                                            Call.populate(call,{ path: 'caller callee',  select: 'name username firstSurname lastSurname email thumbnail'}, function(error, popCall){
-                                                if (!error && popCall){
-                                                    contact.emit('call:invite', popCall);
-                                                }
-                                            });
-                                        }
-                                        else{
-                                            console.log(error);
-                                        }
-                                    });
-                                }
-                                else if (msg.call.type === 'JOIN'){
-                                    console.log('join');
-                                    Call.findById(msg.call.id, {path: 'caller callee', select: 'name username firstSurname lastSurname email thumbnail'}, function(err, call){
-                                        if (!err && call){
-                                            console.log(call);
-                                            contact.emit('call:invite', call);
-                                        }
-                                        else{
-                                            console.log(err);
-                                        }
-                                    });
-                                }
-                            }
-                        }
-                    });
-                });
+
+    //callback is a function whose first parameter is the proposerId
+    function getSocketProperty(socket, paramName, callback) {
+        socket.get(paramName, function(err, idProposer){
+            if (!err && idProposer) {
+                if (callback) callback(idProposer);
             }
+        });
+    };
+
+    function findContactSocketById(currentUserId, contactId, callback) {
+        var clients = (currentUserId === null)
+            ? io.sockets.clients()
+            : io.sockets.clients(currentUserId);
+
+        clients.forEach( function(socket) {
+            getSocketProperty(socket, 'id', function (socketId) {
+                if (socketId === contactId){
+                    if (callback) callback(socket);
+                }
+            });
+        });
+    };
+
+    function findSocketById(id, callback){
+        findContactSocketById(null, id, callback);
+    };
+
+    function createCall (callerId, calleeId, callback) {
+        Call.create({caller: callerId, callee: [calleeId]}, function (error, call){
+            if (!error && call) {
+                if (callback) callback(call);
+            }
+        });
+    };
+
+    function populateCall(call, callback) {
+        Call.populate(call,{ path: 'caller callee',  select: 'name username firstSurname lastSurname email thumbnail'}, function(error, popCall){
+            if (!error && popCall){
+                if (callback) callback(popCall);
+            }
+        });
+    };
+
+    function findCallById(callId, callback) {
+        Call.findById(callId, {path: 'caller callee', select: 'name username firstSurname lastSurname email thumbnail'}, function(err, call){
+            if (!err && call) {
+                if (callback) callback(call);
+            }
+        });
+    };
+
+    function rejectCall (callId, callback) {
+        Call.findByIdAndUpdate(callId,{status: 'CANCELLED'})
+            .populate({
+                path: 'caller callee',
+                select: 'name username firstSurname lastSurname email thumbnail'
+            })
+            .exec(function(err, call){
+                if (!err && call) {
+                    if (callback) callback(call);
+                }
+            });
+    };
+
+    function UpdateAndNotifyRelationship(socket, contactId, oldStatus, newStatus, callback) {
+        updateRelationship(socket, contactId, oldStatus, newStatus, function(user) {
+            socket.emit('contacts:update', {
+                accepted: user.accepted,
+                requested: user.requested,
+                pending: user.pending,
+                blocked: user.blocked
+            });
+            if (callback) callback(updateUser);
+        });
+    }
+
+    function updateRelationship(socket, contactId, oldStatus, newStatus, callback) {
+        getSocketProperty(socket, 'id', function (userId){
+            User.swapRelation(contactId, userId, oldStatus, newStatus, function (err, updatedUser) {
+                if (err) {
+                    callback(err, 'updateError');
+                }
+                else {
+                    if (callback) callback(updatedUser);
+                }
+            });
+        });
+    }
+
+    function sendRosterUpdate(sourceSocket, destinationSocket) {
+        getSocketProperty(sourceSocket, 'id', function (id){
+           getSocketProperty(sourceSocket, 'status', function (status){
+               destinationSocket.emit('roster:update', {id: id, status: status})
+           });
+        });
+    }
+
+    function updateSelfStatus(sourceSocket) {
+        sendRosterUpdate(sourceSocket, SourceSocket);
+    }
+
+    socket.on('call:invite', function (msg){
+        getSocketProperty(socket, 'id', function (idProposer) {
+            findSocketById(msg.id, function (contactSocket){
+                if (msg.call.type === 'CREATE'){
+                    console.log('create nou');
+                    createCall(idProposer, msg.id, function (call){
+                        populateCall(call, function (populatedCall){
+                            contactSocket.emit('call:invite', populatedCall);
+                        });
+                    });
+                }
+
+                else if (msg.call.type === 'JOIN'){
+                    console.log('join nou');
+                    findCallById(msg.call.id, function (populatedCall){
+                        contactSocket.emit('call:invite', populatedCall);
+                    });
+                }
+
+            });
         });
     });
 
     socket.on('call:accept', function(msg){
         console.log('call:accept');
-        socket.get('id', function(err, id){
-            if (!err && id){
-                Call.addUserToCall(msg.id, id, function(data){
-                    io.sockets.clients().forEach(function(contact){
-                        contact.get('id', function(error2, idContact){
-                            if (!error2 && idContact){
-                                if (idContact === data.caller.id){
-                                    contact.emit('call:accept', data);
-                                }
-                            }
-                        });
-                    });
-                });
 
-            }
-            else {
-                console.log('error in call accept');
-            }
+        getSocketProperty(socket, 'id', function (idProposer) {
+            Call.addUserToCall(msg.id, idProposer, function(call) {
+                findSocketById(call.caller.id, function (contactSocket) {
+                    contactSocket.emit('call:accept', call);
+                });
+            });
         });
+
     });
 
     socket.on('call:reject', function(msg){
         console.log('call:reject');
-        socket.get('id', function(err, id){
-            if (!err && id){
-                Call.findByIdAndUpdate(msg.id,{status: 'CANCELLED'}).populate( { path: 'caller callee',
-                    select: 'name username firstSurname lastSurname email thumbnail'
-                }).exec(function(err, data){
-                        io.sockets.clients().forEach(function(contact){
-                            contact.get('id', function(error2, idContact){
-                                if (!error2 && idContact){
-                                    if (idContact === data.caller.id){
-                                        contact.emit('call:reject', data);
-                                    }
-                                }
-                            });
-                        });
-                    });
-
-            }
-            else {
-                console.log('error in call accept');
-            }
+        //TODO at the moment there is no use on getting who cancels the call...
+        getSocketProperty(socket, 'id', function (idProposer){
+            rejectCall(msg.id, function (rejectedCall) {
+                findSocketById(rejectedCall.caller.id, function (contactSocket) {
+                    contactSocket.emit('call:reject', rejectedCall)
+                });
+            });
         });
     });
 
     socket.on('call:register', function(msg){
-        socket.get('id', function(err, id){
-            if (!err && id){
-                User.findById(id, function(err2, user){
-                    if (!err2 && user){
-                        console.log('user: '+id+' joined call room: '+msg.id);
-                        socket.join('call:'+msg.id);
-                        socket.broadcast.to('call:'+msg.id).emit('call:addUser', user);
-                    }
-                });
-            }
+        getSocketProperty(socket, 'id', function (idProposer){
+            User.findById(idProposer, function (err, user){
+                if (!err && user){
+                    console.log('user: '+idProposer+' joined call room: '+msg.id);
+                    socket.join('call:'+msg.id);
+                    socket.broadcast.to('call:'+msg.id).emit('call:addUser', user);
+                }
+            });
         });
+//        socket.get('id', function(err, id){
+//            if (!err && id){
+//                User.findById(id, function(err2, user){
+//                    if (!err2 && user){
+//                        console.log('user: '+id+' joined call room: '+msg.id);
+//                        socket.join('call:'+msg.id);
+//                        socket.broadcast.to('call:'+msg.id).emit('call:addUser', user);
+//                    }
+//                });
+//            }
+//        });
     });
 
     socket.on('call:unregister', function(msg){
-        socket.get('id', function(err, id){
-            if (!err && id){
-                User.findById(id, function(err2, user){
-                    if (!err2 && user){
-                        console.log('user: '+id+' left call room: '+msg.id);
-                        socket.broadcast.to('call:'+msg.id).emit('call:removeUser', user);
-                        socket.leave('call:'+msg.id);
-                    }
-                });
-            }
+        getSocketProperty(socket, 'id', function (idProposer){
+            User.findById(idProposer, function (err, user){
+                if (!err && user){
+                    console.log('user: '+idProposer+' left call room: '+msg.id);
+                    socket.broadcast.to('call:'+msg.id).emit('call:removeUser', user);
+                    socket.leave('call:'+msg.id);
+                }
+            });
         });
+//        socket.get('id', function(err, id){
+//            if (!err && id){
+//                User.findById(id, function(err2, user){
+//                    if (!err2 && user){
+//                        console.log('user: '+id+' left call room: '+msg.id);
+//                        socket.broadcast.to('call:'+msg.id).emit('call:removeUser', user);
+//                        socket.leave('call:'+msg.id);
+//                    }
+//                });
+//            }
+//        });
     });
 
     socket.on('call:userDetails', function(msg){
