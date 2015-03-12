@@ -175,22 +175,27 @@ userSchema.statics.exists = function(username, callback){
 userSchema.methods.changeRelationStatus = function(oldStatus, newStatus, userId, callback){
     console.log('Changing relationship Status!');
 
-    if (this[oldStatus].indexOf(userId) != -1){
-        this[oldStatus].pull(userId)
+    if (this[oldStatus].indexOf(userId) != -1) {
+        this[oldStatus].pull(userId);
         this[newStatus].addToSet(userId);
+
+        this.save(function (error, savedUser, numModified) {
+            console.log('savedUser: ' + savedUser);
+            if (error)
+                throw error;
+            User.populate(savedUser,
+                {
+                    path: 'pending accepted requested blocked',
+                    select: 'name username firstSurname lastSurname email thumbnail'
+                },
+                callback);
+        });
+
+    } else {
+        console.log('Couldn\'t change relationship status bc no oldRelation with the user was found!');
     }
 
-    this.save(function(error, savedUser, numModified){
-        console.log('savedUser: '+savedUser);
-        if (error)
-            throw error;
-        User.populate(savedUser,
-            {   path: 'pending accepted requested blocked',
-                select: 'name username firstSurname lastSurname email thumbnail'
-            },
-            callback);
-    });
+};
 
-}
 var User = Mongoose.model('User', userSchema);
 exports.User = User;
